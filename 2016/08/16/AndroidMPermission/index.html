@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="android M 的名字官方刚发布不久，最终正式版即将来临！android在不断发展，最近的更新 M 非常不同，一些主要的变化例如运行时权限将有颠覆性影响。惊讶的是android社区鲜有谈论这事儿，尽管这事很重要或许在不远的将来会引发很严重的问题。这是今天我写这篇博客的原因。这里有一切关于android运行时权限你需要知道的，包括如何在代码中实现。现在亡羊补牢还不晚。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android M 新的运行时权限开发者需要知道的一切">
+<meta property="og:url" content="http://ocnyang.com/2016/08/16/AndroidMPermission/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="android M 的名字官方刚发布不久，最终正式版即将来临！android在不断发展，最近的更新 M 非常不同，一些主要的变化例如运行时权限将有颠覆性影响。惊讶的是android社区鲜有谈论这事儿，尽管这事很重要或许在不远的将来会引发很严重的问题。这是今天我写这篇博客的原因。这里有一切关于android运行时权限你需要知道的，包括如何在代码中实现。现在亡羊补牢还不晚。">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionruntimepermission.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionruntimepermissioncrash.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionpermissionsrevoke.jpg">
+<meta property="og:image" content="http://img.shedoor.net/mpermission22_1%20%281%29.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionmpermission22denyperm_1.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissiontargetsdkversion2223.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionpermgroup.png">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionneveraskagain.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionrationaledialog.jpg">
+<meta property="og:image" content="http://img.shedoor.net/runtime_permissionpermissionsrevoke%20%281%29.jpg">
+<meta property="article:published_time" content="2016-08-16T09:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.779Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android6.0权限">
+<meta property="article:tag" content="Android教程系列">
+<meta property="article:tag" content="AndroidM权限">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/runtime_permissionruntimepermission.jpg">
+
+<link rel="canonical" href="http://ocnyang.com/2016/08/16/AndroidMPermission/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Android M 新的运行时权限开发者需要知道的一切 | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2016/08/16/AndroidMPermission/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android M 新的运行时权限开发者需要知道的一切
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-08-16 09:03:15" itemprop="dateCreated datePublished" datetime="2016-08-16T09:03:15+00:00">2016-08-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">Android教程系列</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>13k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>12 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>android M 的名字官方刚发布不久，最终正式版即将来临！<br>android在不断发展，最近的更新 M 非常不同，一些主要的变化例如运行时权限将有颠覆性影响。惊讶的是android社区鲜有谈论这事儿，尽管这事很重要或许在不远的将来会引发很严重的问题。<br>这是今天我写这篇博客的原因。这里有一切关于android运行时权限你需要知道的，包括如何在代码中实现。现在亡羊补牢还不晚。</p>
+<span id="more"></span>
+
+<h2 id="新运行时权限"><a href="#新运行时权限" class="headerlink" title="新运行时权限"></a>新运行时权限</h2><p>android的权限系统一直是首要的安全概念，因为这些权限只在安装的时候被询问一次。一旦安装了，app可以在用户毫不知晓的情况下访问权限内的所有东西。<br>难怪一些坏蛋利用这个缺陷恶意收集用户数据用来做坏事了！<br>android小组也知道这事儿。7年了！权限系统终于被重新设计了。在android6.0棉花糖，app将不会在安装的时候授予权限。取而代之的是，app不得不在运行时一个一个询问用户授予权限。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionruntimepermission.jpg">  </p>
+<p>注意权限询问对话框不会自己弹出来。开发者不得不自己调用。如果开发者要调用的一些函数需要某权限而用户又拒绝授权的话，函数将抛出异常直接导致程序崩溃。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionruntimepermissioncrash.jpg">  </p>
+<p>另外，用户也可以随时在设置里取消已经授权的权限。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionpermissionsrevoke.jpg">  </p>
+<p>你或许已经感觉到背后生出一阵寒意。。。如果你是个android开发者，意味着要完全改变你的程序逻辑。你不能像以前那样直接调用方法了，你不得不为每个需要的地方检察权限，否则app就崩溃了！<br>是的。我不能哄你说这是简单的事儿。尽管这对用户来说是好事，但是对开发者来说就是噩梦。我们不得不修改编码不然不论短期还是长远来看都是潜在的问题。<br>这个新的运行时权限仅当我们设置targetSdkVersion to 23（这意味着你已经在23上测试通过了）才起作用，当然还要是M系统的手机。app在6.0之前的设备依然使用旧的权限系统。</p>
+<h2 id="已经发布了的app会发生什么"><a href="#已经发布了的app会发生什么" class="headerlink" title="已经发布了的app会发生什么"></a>已经发布了的app会发生什么</h2><blockquote>
+<p>新运行时权限可能已经让你开始恐慌了。<strong>“hey，伙计！我三年前发布的app可咋整呢。如果他被装到android 6.0上，我的app会崩溃吗？！？”</strong><br>莫慌张，放轻松。android小队又不傻，肯定考虑到了这情况。<strong>如果app的targetSdkVersion 低于 23，那将被认为app没有用23新权限测试过，那将被继续使用旧有规则：用户在安装的时候不得不接受所有权限，安装后app就有了那些权限咯！</strong>  </p>
+</blockquote>
+<p><img src="http://img.shedoor.net/mpermission22_1%20%281%29.jpg">  </p>
+<p>然后app像以前一样奔跑！注意，此时用户依然可以取消已经同意的授权！用户取消授权时，android 6.0系统会警告，但这不妨碍用户取消授权。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionmpermission22denyperm_1.jpg">  </p>
+<p>问题又来了，这时候你的app崩溃吗？<br>善意的主把这事也告诉了android小组，当我们在targetSdkVersion 低于23的app调用一个需要权限的函数时，这个权限如果被用户取消授权了的话，不抛出异常。但是他将啥都不干，结果导致函数返回值是null或者0.  </p>
+<p><img src="http://img.shedoor.net/runtime_permissiontargetsdkversion2223.jpg">  </p>
+<p>别高兴的太早。尽管app不会调用这个函数时崩溃，返回值null或者0可能接下来依然导致崩溃。<br>好消息（至少目前看来）是这类取消权限的情况比较少，我相信很少用户这么搞。如果他们这么办了，后果自负咯。<br>但从长远看来，我相信还是会有大量用户会关闭一些权限。我们app不能在新设备完美运行这是不可接受的。<br>怎样让他完美运行呢，你最好修改代码支持最新的权限系统，而且我建议你立刻着手搞起！<br>代码没有成功改为支持最新运行时权限的app,不要设置targetSdkVersion 23 发布，否则你就有麻烦了。只有当你测试过了，再改为targetSdkVersion 23 。  </p>
+<blockquote>
+<p><strong>警告：现在你在android studio新建项目，targetSdkVersion 会自动设置为 23。如果你还没支持新运行时权限，我建议你首先把targetSdkVersion 降级到22</strong>  </p>
+</blockquote>
+<h2 id="PROTECTION-NORMAL类权限"><a href="#PROTECTION-NORMAL类权限" class="headerlink" title="PROTECTION_NORMAL类权限"></a>PROTECTION_NORMAL类权限</h2><p>当用户安装或更新应用时，系统将授予应用所请求的属于 PROTECTION_NORMAL 的所有权限（安装时授权的一类基本权限）。这类权限包括：  </p>
+<pre><code>android.permission.ACCESS_LOCATION_EXTRA_COMMANDS
+android.permission.ACCESS_NETWORK_STATE
+android.permission.ACCESS_NOTIFICATION_POLICY
+android.permission.ACCESS_WIFI_STATE
+android.permission.ACCESS_WIMAX_STATE
+android.permission.BLUETOOTH
+android.permission.BLUETOOTH_ADMIN
+android.permission.BROADCAST_STICKY
+android.permission.CHANGE_NETWORK_STATE
+android.permission.CHANGE_WIFI_MULTICAST_STATE
+android.permission.CHANGE_WIFI_STATE
+android.permission.CHANGE_WIMAX_STATE
+android.permission.DISABLE_KEYGUARD
+android.permission.EXPAND_STATUS_BAR
+android.permission.FLASHLIGHT
+android.permission.GET_ACCOUNTS
+android.permission.GET_PACKAGE_SIZE
+android.permission.INTERNET
+android.permission.KILL_BACKGROUND_PROCESSES
+android.permission.MODIFY_AUDIO_SETTINGS
+android.permission.NFC
+android.permission.READ_SYNC_SETTINGS
+android.permission.READ_SYNC_STATS
+android.permission.RECEIVE_BOOT_COMPLETED
+android.permission.REORDER_TASKS
+android.permission.REQUEST_INSTALL_PACKAGES
+android.permission.SET_TIME_ZONE
+android.permission.SET_WALLPAPER
+android.permission.SET_WALLPAPER_HINTS
+android.permission.SUBSCRIBED_FEEDS_READ
+android.permission.TRANSMIT_IR
+android.permission.USE_FINGERPRINT
+android.permission.VIBRATE
+android.permission.WAKE_LOCK
+android.permission.WRITE_SYNC_SETTINGS
+com.android.alarm.permission.SET_ALARM
+com.android.launcher.permission.INSTALL_SHORTCUT
+com.android.launcher.permission.UNINSTALL_SHORTCUT
+</code></pre>
+<p>只需要在AndroidManifest.xml中简单声明这些权限就好，安装时就授权。不需要每次使用时都检查权限，而且用户不能取消以上授权。  </p>
+<h2 id="让你的app支持新运行时权限"><a href="#让你的app支持新运行时权限" class="headerlink" title="让你的app支持新运行时权限"></a>让你的app支持新运行时权限</h2><p>是时候让我们的app支持新权限模型了，从设置<strong>compileSdkVersion</strong> and <strong>targetSdkVersion</strong> 为 23开始吧.</p>
+<pre><code>android &#123;
+    compileSdkVersion 23
+    ...
+
+    defaultConfig &#123;
+        ...
+        targetSdkVersion 23
+        ...
+    &#125;
+</code></pre>
+<p>例子，我想用以下方法添加联系人。</p>
+<pre><code>privatestaticfinal String TAG = &quot;Contacts&quot;;
+privatevoid insertDummyContact() &#123;
+// Two operations are needed to insert a new contact.
+    ArrayList operations = new ArrayList(2);
+
+// First, set up a new raw contact.
+    ContentProviderOperation.Builder op =
+            ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
+    operations.add(op.build());
+
+// Next, set the name for the contact.
+    op = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+            .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+            .withValue(ContactsContract.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+            .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+&quot;__DUMMY CONTACT from runtime permissions sample&quot;);
+    operations.add(op.build());
+
+// Apply the operations.
+    ContentResolver resolver = getContentResolver();
+try &#123;
+        resolver.applyBatch(ContactsContract.AUTHORITY, operations);
+    &#125; catch (RemoteException e) &#123;
+        Log.d(TAG, &quot;Could not add a new contact: &quot; + e.getMessage());
+    &#125; catch (OperationApplicationException e) &#123;
+        Log.d(TAG, &quot;Could not add a new contact: &quot; + e.getMessage());
+    &#125;
+&#125;
+</code></pre>
+<p>上面代码需要WRITE_CONTACTS权限。如果不询问授权，app就崩了。<br>下一步像以前一样在AndroidManifest.xml添加声明权限。</p>
+<pre><code>&lt;uses-permission  android:name=&quot;android.permission.WRITE_CONTACTS&quot;/&gt;
+</code></pre>
+<p>下一步，不得不再写个方法检查有没有权限。如果没有弹个对话框询问用户授权。然后你才可以下一步创建联系人。<br>权限被分组了，如下表：  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionpermgroup.png">  </p>
+<p>同一组的任何一个权限被授权了，其他权限也自动被授权。例如，一旦WRITE_CONTACTS被授权了，app也有READ_CONTACTS和GET_ACCOUNTS权限了。<br>源码中被用来检查和请求权限的方法分别是Activity的checkSelfPermission和requestPermissions。这些方法在api23引入。</p>
+<pre><code>finalprivateint REQUEST_CODE_ASK_PERMISSIONS = 123;
+
+privatevoid insertDummyContactWrapper() &#123;
+int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
+if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) &#123;
+        requestPermissions(new String[] &#123;Manifest.permission.WRITE_CONTACTS&#125;,
+                REQUEST_CODE_ASK_PERMISSIONS);
+return;
+    &#125;
+    insertDummyContact();
+&#125;
+</code></pre>
+<p>如果已有权限，insertDummyContact()会执行。否则，requestPermissions被执行来弹出请求授权对话框，如下：</p>
+<p>不论用户同意还是拒绝，activity的onRequestPermissionsResult会被回调来通知结果（通过第三个参数），grantResults,如下：</p>
+<pre><code>@Override
+publicvoid onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) &#123;
+switch (requestCode) &#123;
+caseREQUEST_CODE_ASK_PERMISSIONS:
+if (grantResults[0] == PackageManager.PERMISSION_GRANTED) &#123;
+// Permission Granted
+                insertDummyContact();
+            &#125; else &#123;
+// Permission Denied
+                Toast.makeText(MainActivity.this, &quot;WRITE_CONTACTS Denied&quot;, Toast.LENGTH_SHORT)
+                        .show();
+            &#125;
+break;
+        default:
+super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    &#125;
+&#125;
+</code></pre>
+<p>这就是新权限模型工作过程。代码真复杂但是只能去习惯它。。。为了让app很好兼容新权限模型，你不得不用以上类似方法处理所有需要的情况。<br>如果你想捶墙，现在是时候了。。。  </p>
+<h2 id="处理-“不再提醒”"><a href="#处理-“不再提醒”" class="headerlink" title="处理 “不再提醒”"></a>处理 “不再提醒”</h2><p>如果用户拒绝某授权。下一次弹框，用户会有一个“不再提醒”的选项的来防止app以后继续请求授权。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionneveraskagain.jpg">  </p>
+<p>如果这个选项在拒绝授权前被用户勾选了。下次为这个权限请求requestPermissions时，对话框就不弹出来了，结果就是，app啥都不干。<br>这将是很差的用户体验，用户做了操作却得不到响应。这种情况需要好好处理一下。在请求requestPermissions前，我们通过activity的shouldShowRequestPermissionRationale方法来检查是否需要弹出请求权限的提示对话框，代码如下：</p>
+<pre><code>final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+
+private void insertDummyContactWrapper() &#123;
+int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
+if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) &#123;
+if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_CONTACTS)) &#123;
+                showMessageOKCancel(&quot;You need to allow access to Contacts&quot;,
+new DialogInterface.OnClickListener() &#123;
+@Override
+publicvoid onClick(DialogInterface dialog, int which) &#123;
+                                requestPermissions(new String[] &#123;Manifest.permission.WRITE_CONTACTS&#125;,
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            &#125;
+                        &#125;);
+return;
+            &#125;
+        requestPermissions(new String[] &#123;Manifest.permission.WRITE_CONTACTS&#125;,
+                REQUEST_CODE_ASK_PERMISSIONS);
+return;
+    &#125;
+    insertDummyContact();
+&#125;
+
+private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) &#123;
+new AlertDialog.Builder(MainActivity.this)
+            .setMessage(message)
+            .setPositiveButton(&quot;OK&quot;, okListener)
+            .setNegativeButton(&quot;Cancel&quot;, null)
+            .create()
+            .show();
+&#125;
+</code></pre>
+<p>当一个权限第一次被请求和用户标记过不再提醒的时候,我们写的对话框被展示。<br>最后一种情况，onRequestPermissionsResult 会收到PERMISSION_DENIED ，系统询问对话框不展示。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionrationaledialog.jpg">  </p>
+<p>搞定！  </p>
+<h2 id="一次请求多个权限"><a href="#一次请求多个权限" class="headerlink" title="一次请求多个权限"></a>一次请求多个权限</h2><p>当然了有时候需要好多权限，可以用上面方法一次请求多个权限。不要忘了为每个权限检查“不再提醒”的设置。<br>修改后的代码：</p>
+<pre><code>final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+
+private void insertDummyContactWrapper() &#123;
+    List&lt;String&gt; permissionsNeeded = new ArrayList&lt;String&gt;();
+
+    final List&lt;String&gt; permissionsList = new ArrayList&lt;String&gt;();
+    if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION))
+        permissionsNeeded.add(&quot;GPS&quot;);
+    if (!addPermission(permissionsList, Manifest.permission.READ_CONTACTS))
+        permissionsNeeded.add(&quot;Read Contacts&quot;);
+    if (!addPermission(permissionsList, Manifest.permission.WRITE_CONTACTS))
+        permissionsNeeded.add(&quot;Write Contacts&quot;);
+
+    if (permissionsList.size() &gt; 0) &#123;
+        if (permissionsNeeded.size() &gt; 0) &#123;
+            // Need Rationale
+            String message = &quot;You need to grant access to &quot; + permissionsNeeded.get(0);
+            for (int i = 1; i &lt; permissionsNeeded.size(); i++)
+                message = message + &quot;, &quot; + permissionsNeeded.get(i);
+            showMessageOKCancel(message,
+                    new DialogInterface.OnClickListener() &#123;
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) &#123;
+                            requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                        &#125;
+                    &#125;);
+            return;
+        &#125;
+        requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+        return;
+    &#125;
+
+    insertDummyContact();
+&#125;
+
+private boolean addPermission(List&lt;String&gt; permissionsList, String permission) &#123;
+    if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) &#123;
+        permissionsList.add(permission);
+        // Check for Rationale Option
+        if (!shouldShowRequestPermissionRationale(permission))
+            return false;
+    &#125;
+    return true;
+&#125;
+</code></pre>
+<p>如果所有权限被授权，依然回调onRequestPermissionsResult，我用hashmap让代码整洁便于阅读。</p>
+<pre><code>@Override
+publicvoid onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) &#123;
+switch (requestCode) &#123;
+caseREQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
+            &#123;
+            Map perms = new HashMap();
+// Initial
+            perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
+            perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
+            perms.put(Manifest.permission.WRITE_CONTACTS, PackageManager.PERMISSION_GRANTED);
+// Fill with results
+for (int i = 0; i &lt; permissions.length; i++)
+                perms.put(permissions[i], grantResults[i]);
+// Check for ACCESS_FINE_LOCATION
+if (perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    &amp;&amp; perms.get(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
+                    &amp;&amp; perms.get(Manifest.permission.WRITE_CONTACTS) == PackageManager.PERMISSION_GRANTED) &#123;
+// All Permissions Granted
+                insertDummyContact();
+            &#125; else &#123;
+// Permission Denied
+                Toast.makeText(MainActivity.this, &quot;Some Permission is Denied&quot;, Toast.LENGTH_SHORT)
+                        .show();
+            &#125;
+            &#125;
+break;
+        default:
+super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    &#125;
+&#125;
+</code></pre>
+<p>条件灵活的，你自己设置。有的情况，一个权限没有授权，就不可用；但是也有情况，能工作，但是表现的是有所限制的。对于这个我不做评价，你自己设计吧。  </p>
+<h2 id="用兼容库使代码兼容旧版"><a href="#用兼容库使代码兼容旧版" class="headerlink" title="用兼容库使代码兼容旧版"></a>用兼容库使代码兼容旧版</h2><p>以上代码在android 6.0以上运行没问题，但是23 api之前就不行了，因为没有那些方法。<br>粗暴的方法是检查版本</p>
+<pre><code>if (Build.VERSION.SDK_INT &gt;= 23) &#123;
+// Marshmallow+
+&#125; else &#123;
+// Pre-Marshmallow
+&#125;
+</code></pre>
+<p>但是太复杂，我建议用v4兼容库，已对这个做过兼容，用这个方法代替：  </p>
+<ul>
+<li>ContextCompat.checkSelfPermission()<br>  被授权函数返回PERMISSION_GRANTED，否则返回PERMISSION_DENIED ，在所有版本都是如此。</li>
+<li>ActivityCompat.requestPermissions()<br>  这个方法在M之前版本调用，OnRequestPermissionsResultCallback 直接被调用，带着正确的 PERMISSION_GRANTED或者 PERMISSION_DENIED 。</li>
+<li>ActivityCompat.shouldShowRequestPermissionRationale()<br>  在M之前版本调用，永远返回false。<br>  用v4包的这三方法，完美兼容所有版本！这个方法需要额外的参数，Context or Activity。别的就没啥特别的了。下面是代码：  <blockquote>
+</blockquote>
+</li>
+</ul>
+<pre><code>private void insertDummyContactWrapper()&#123;
+int hasWriteContactsPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+            Manifest.permission.WRITE_CONTACTS);
+if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) &#123;
+if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                Manifest.permission.WRITE_CONTACTS)) &#123;
+            showMessageOKCancel(&quot;You need to allow access to Contacts&quot;,
+new DialogInterface.OnClickListener() &#123;
+@Override
+publicvoidonClick(DialogInterface dialog, int which)&#123;
+                            ActivityCompat.requestPermissions(MainActivity.this,
+new String[] &#123;Manifest.permission.WRITE_CONTACTS&#125;,
+                                    REQUEST_CODE_ASK_PERMISSIONS);
+                        &#125;
+                    &#125;);
+return;
+        &#125;
+        ActivityCompat.requestPermissions(MainActivity.this,
+new String[] &#123;Manifest.permission.WRITE_CONTACTS&#125;,
+                REQUEST_CODE_ASK_PERMISSIONS);
+return;
+    &#125;
+    insertDummyContact();
+&#125;  
+</code></pre>
+<p>后两个方法，我们也可以在Fragment中使用，用v13兼容包：FragmentCompat.requestPermissions() and FragmentCompat.shouldShowRequestPermissionRationale()和activity效果一样。  </p>
+<h2 id="第三方库简化代码"><a href="#第三方库简化代码" class="headerlink" title="第三方库简化代码"></a>第三方库简化代码</h2><p>以上代码真尼玛复杂。为解决这事，有许多第三方库已经问世了，真66溜真有速度。我试了很多最终找到了个满意的<a target="_blank" rel="noopener" href="https://github.com/hotchemi/PermissionsDispatcher">hotchemi’s PermissionsDispatcher</a>。<br>他和我上面做的一样，只是简化了代码。灵活易扩展，试一下吧。如果不满足你可以找些其他的。  </p>
+<h2 id="如果我的app还开着呢，权限被撤销了，会发生生么"><a href="#如果我的app还开着呢，权限被撤销了，会发生生么" class="headerlink" title="如果我的app还开着呢，权限被撤销了，会发生生么"></a>如果我的app还开着呢，权限被撤销了，会发生生么</h2><p>权限随时可以被撤销。  </p>
+<p><img src="http://img.shedoor.net/runtime_permissionpermissionsrevoke%20%281%29.jpg">  </p>
+<p>当app开着的时候被撤消了会发生什么呢？我试过了发现这时app会突然终止 terminated。app中的一切都被简单粗暴的停止了，因为terminated！对我来说这可以理解，因为系统如果允许它继续运行（没有某权限），这会召唤弗雷迪到我的噩梦里。或许更糟…  </p>
+<h2 id="结论建议"><a href="#结论建议" class="headerlink" title="结论建议"></a>结论建议</h2><p>我相信你对新权限模型已经有了清晰的认识。我相信你也意识到了问题的严峻。<br>但是你没得选择。新运行时权限已经在棉花糖中被使用了。我们没有退路。我们现在唯一能做的就是保证app适配新权限模型.<br>欣慰的是只有少数权限需要运行时权限模型。大多数常用的权限，例如，网络访问，属于Normal Permission 在安装时自动会授权，当然你要声明，以后无需检查。因此，只有少部分代码你需要修改。<br>两个建议：  </p>
+<ol>
+<li>严肃对待新权限模型</li>
+<li>如果你代码没支持新权限，不要设置targetSdkVersion 23 。尤其是当你在Studio新建工程时，不要忘了修改！  </li>
+</ol>
+<p>说一下代码修改。这是大事，如果代码结构被设计的不够好，你需要一些很蛋疼的重构。每个app都要被修正。如上所说，我们没的选择。。。<br>列出所有你需要请求的权限所有情形，如果A被授权，B被拒绝，会发生什么。blah，blah。<br>祝重构顺利。把它列为你需要做的大事，从现在就开始着手做，以保证M正式发布的时候没有问题。<br>希望本文对你有用，快乐编码！  </p>
+<blockquote>
+<p>译文来自 <em><a target="_blank" rel="noopener" href="http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en">http://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en</a></em><br>翻译摘录来自 <em><a target="_blank" rel="noopener" href="http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/">http://jijiaxin89.com/2015/08/30/Android-s-Runtime-Permission/</a></em>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2016/08/16/AndroidMPermission/" title="Android M 新的运行时权限开发者需要知道的一切">http://ocnyang.com/2016/08/16/AndroidMPermission/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android6-0%E6%9D%83%E9%99%90/" rel="tag"><i class="fa fa-tag"></i> Android6.0权限</a>
+              <a href="/tags/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" rel="tag"><i class="fa fa-tag"></i> Android教程系列</a>
+              <a href="/tags/AndroidM%E6%9D%83%E9%99%90/" rel="tag"><i class="fa fa-tag"></i> AndroidM权限</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/16/Android6Permission/" rel="prev" title="在Android 6.0 设备上动态获取权限">
+      <i class="fa fa-chevron-left"></i> 在Android 6.0 设备上动态获取权限
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/17/GlideUse/" rel="next" title="Glide图片加载库的使用">
+      Glide图片加载库的使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9D%83%E9%99%90"><span class="nav-number">1.</span> <span class="nav-text">新运行时权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%B2%E7%BB%8F%E5%8F%91%E5%B8%83%E4%BA%86%E7%9A%84app%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">已经发布了的app会发生什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PROTECTION-NORMAL%E7%B1%BB%E6%9D%83%E9%99%90"><span class="nav-number">3.</span> <span class="nav-text">PROTECTION_NORMAL类权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A9%E4%BD%A0%E7%9A%84app%E6%94%AF%E6%8C%81%E6%96%B0%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9D%83%E9%99%90"><span class="nav-number">4.</span> <span class="nav-text">让你的app支持新运行时权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86-%E2%80%9C%E4%B8%8D%E5%86%8D%E6%8F%90%E9%86%92%E2%80%9D"><span class="nav-number">5.</span> <span class="nav-text">处理 “不再提醒”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E6%AC%A1%E8%AF%B7%E6%B1%82%E5%A4%9A%E4%B8%AA%E6%9D%83%E9%99%90"><span class="nav-number">6.</span> <span class="nav-text">一次请求多个权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E5%85%BC%E5%AE%B9%E5%BA%93%E4%BD%BF%E4%BB%A3%E7%A0%81%E5%85%BC%E5%AE%B9%E6%97%A7%E7%89%88"><span class="nav-number">7.</span> <span class="nav-text">用兼容库使代码兼容旧版</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93%E7%AE%80%E5%8C%96%E4%BB%A3%E7%A0%81"><span class="nav-number">8.</span> <span class="nav-text">第三方库简化代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%88%91%E7%9A%84app%E8%BF%98%E5%BC%80%E7%9D%80%E5%91%A2%EF%BC%8C%E6%9D%83%E9%99%90%E8%A2%AB%E6%92%A4%E9%94%80%E4%BA%86%EF%BC%8C%E4%BC%9A%E5%8F%91%E7%94%9F%E7%94%9F%E4%B9%88"><span class="nav-number">9.</span> <span class="nav-text">如果我的app还开着呢，权限被撤销了，会发生生么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.</span> <span class="nav-text">结论建议</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : 'a9d272979f0f28e5f2cc961f7ddbad70',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

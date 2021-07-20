@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="今天就是一年一度的1024节了！ package com.ocnyang.app; &#x2F;**  * 程序员们，1024快乐。  *&#x2F; public class Hello1024 &amp;#123;     public static final String PROGRAM_APES &#x3D; &quot;程序猿&quot;;     public static final String PROGRAM_GI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你真的懂啥是1024吗？">
+<meta property="og:url" content="http://ocnyang.com/2016/10/24/day1024/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="今天就是一年一度的1024节了！ package com.ocnyang.app; &#x2F;**  * 程序员们，1024快乐。  *&#x2F; public class Hello1024 &amp;#123;     public static final String PROGRAM_APES &#x3D; &quot;程序猿&quot;;     public static final String PROGRAM_GI">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/1024/1024.gif">
+<meta property="og:image" content="http://img.shedoor.net/1024/10242.png">
+<meta property="article:published_time" content="2016-10-24T09:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.783Z">
+<meta property="article:author" content="OCNYang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/1024/1024.gif">
+
+<link rel="canonical" href="http://ocnyang.com/2016/10/24/day1024/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>你真的懂啥是1024吗？ | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2016/10/24/day1024/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          你真的懂啥是1024吗？
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-10-24 09:03:15" itemprop="dateCreated datePublished" datetime="2016-10-24T09:03:15+00:00">2016-10-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>今天就是一年一度的<a href="http://ocnyang.com/">1024节</a>了！</p>
+<pre><code>package com.ocnyang.app;
+/**
+ * 程序员们，1024快乐。
+ */
+public class Hello1024 &#123;
+    public static final String PROGRAM_APES = &quot;程序猿&quot;;
+    public static final String PROGRAM_GIRLS = &quot;程序媛&quot;; //这个真不知道怎么翻译了
+    public static final String DATE_1024 = &quot;10月24日&quot;;
+
+    public static void main(String args[]) &#123;
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        java.text.SimpleDateFormat f = new java.text.SimpleDateFormat(&quot;yyyy年MM月dd日hh时mm分ss秒&quot;);
+        is1024(f.format(c.getTime()));
+    &#125;
+
+    private static void is1024(String date) &#123;
+        if ((!android.text.TextUtils.isEmpty(date)) &amp;&amp; date.contains(DATE_1024))
+            System.out.println(PROGRAM_APES + &quot;和&quot; + PROGRAM_GIRLS + &quot;,Happy 1024!&quot;);
+    &#125;
+&#125;
+</code></pre>
+<span id="more"></span>
+
+<p>好吧并没有这个节，不过这个日子该庆祝啥，相信在座诸位很多人都懂的：</p>
+<p>当然是庆祝二进制了！</p>
+<p>1024是一个整数嘛。它等于 210，二进制表示为10000000000。</p>
+<p>本来1024这种东西应该是数学家的玩具，但是不幸我们有了电脑，而电脑是基于二进制运行的，所以这个奇怪的数字就变得人尽皆知了……</p>
+<h2 id="一个来自巧合的单位"><a href="#一个来自巧合的单位" class="headerlink" title="一个来自巧合的单位"></a>一个来自巧合的单位</h2><p>因为电脑的运行和存储都基于二进制，所以内存也好磁盘也好闪存也好，理论总容量应该是2的某次幂。老一些的内存都是64M、128M、256M、512M这样的数字，更老一些的电脑开机自检会在屏幕上读出内存容量，往往还要读3遍，经常能看到16384kB、65536kB这样的数字——这些也都是2的次幂。</p>
+<p><img src="http://img.shedoor.net/1024/1024.gif" alt="1024">  </p>
+<p>可能今天多数人对2的次幂主要的熟悉来源，是2048这个游戏。虽然2048是明确复刻了1024，而1024则是抄袭了”Three!”的创意，但这种事情这里就不要提了吧。图片来源：imgur.com</p>
+<p>但最常用的2次幂，当然还是1024——它是计算机领域的基本倍数：1M = 1024k，1G = 1024M，等等。</p>
+<p>问题来了！<strong>1024和1000</strong>太接近了——一个有趣而有用的巧合，正因此它成了计算机的基本倍数；但另一些时候就烦人了。</p>
+<p>210 ≈ 103，这个巧合在估算的时候很管用。比如想知道262是多少，就把它拆成260 × 22，前者约等于1018，后者等于4，因此就是4×1018。（实际上大约是4.61×1018，相差不大。）</p>
+<p>但这只是数量级上相差不大，1024毕竟不等于1000。如果你买了一个4600T的硬盘，结果到手只有4000T，你可能就不开心了。</p>
+<h2 id="到底是1000还是1024？"><a href="#到底是1000还是1024？" class="headerlink" title="到底是1000还是1024？"></a>到底是1000还是1024？</h2><p>其实现在硬盘几乎都在玩这个花招。计算机内部计算都是按照1024来算的，但是销售时却都会按照1000来宣称。比如我现在这个标称为500G的硬盘，实际上总可用空间是接近500000000000字节，对于计算机来说，只有465G。</p>
+<p><img src="http://img.shedoor.net/1024/10242.png" alt="1000or1024">  </p>
+<p>然而你又不太好说他们错——k啊M啊这些前缀，都是从科学计数法的前缀里拿来的，人家本来就是指1000，只是在电脑里成了1024。这些前缀都来自希腊语：</p>
+<ul>
+<li><strong>kilo</strong>是1795年法国人设立公制的时候从希腊语改来的词，本来是1000，但计算机里1kB = 1024B；</li>
+<li><strong>Mega</strong>来自希腊文“大”，1947年在科学计数法里确立为1000k，在计算机里就是1024k；</li>
+<li><strong>Giga</strong>来自希腊文“非常大”，在科学计数法是1000M，计算机是1024M；</li>
+<li><strong>Tera</strong>来自希腊文“怪物”，在科学计数法是1000G，计算机是1024G；</li>
+<li><strong>Peta</strong>来自希腊文“五”，因为正常的大词用完了，于是改用“第五个1000”这种意思。在科学计数法是1000T，计算机是1024T。其实本来五应该写作penta，但是因为上一个词——Tera正好比“四”Tetra少一个字母，所以Peta也是故意去掉了中间的字母来保证不会和原词相混；</li>
+<li><strong>Exa</strong>来自希腊文“六”，和hexa同根，但这次希腊文自己就没有保留那个“h”，所以沿用了；</li>
+<li><strong>Zetta</strong>是本系列里唯一的异类。正常的希腊文“七”前缀应该是hepta，但没有使用，反而用了希腊数字体系里的Ζʹ（读作zeta）；</li>
+<li><strong>Yotta</strong>则回归本源，来自希腊文“八”。</li>
+</ul>
+<p>一般用户几乎不会接触到P以上的级别。在T这一级上，二者的差距不到10%，大家通常也就忍了。</p>
+<p>为了避免混淆，国际电工委员会（IEC）提出过一个标准：IEC 80000-13。在这个标准下，科学计数法（1000）按照正常标记，而计算机领域（1024）则全都加一个小写i。因此，1kB就是1000B，而1KiB才是1024B；1 MiB = 1024 KiB，1 GiB = 1024 MiB，等等。不幸的是，这个标准没有得到很广泛的使用，现在大家还是都是乱来的。</p>
+<h2 id="最先用1024的可能是……埃及人？"><a href="#最先用1024的可能是……埃及人？" class="headerlink" title="最先用1024的可能是……埃及人？"></a>最先用1024的可能是……埃及人？</h2><p>大家平常喜欢说是中国人发明了二进制。这么说倒也不是不可以，二进制正式进入数学体系要归功于莱布尼兹，而莱布尼兹很喜欢中国，明确认为《易》所用的八卦和六十四卦就是一种二进制。但是古代中国人并没有使用这些二进制数进行计算。单纯说构想出二进制表达数字的办法，那很多文明都干过；然而古埃及人有一种乘法，真的是在用相当于二进制的方式来运算了。</p>
+<p>比如，计算1262 × 13，他们会这样计算：</p>
+<pre><code>1262 × 13
+= (1024 + 128 + 64 + 32 + 8 + 4 + 2) × 13
+= 1024 ×  13 + 128 × 13 + 64 × 13 + 32 × 13 + 8 × 13 + 4 × 13 + 2 × 13
+= 13312 + 1664 + 832 + 416 + 104 + 52 + 26
+= 16406
+</code></pre>
+<p>等等，这是在干啥？</p>
+<p>如果我们来做乘法的话，那么我们会：</p>
+<pre><code>1262 × 13
+= 1000 × 13 + 200 × 13 + 60 × 13 + 2 × 13
+</code></pre>
+<p>……好像也差不多。</p>
+<p>对，古埃及人也是把大数拆成小数来算乘法，但是我们拆成10、100、1000的倍数，而他们则拆成2、4、8、16、32、64……的倍数。这是二进制呀！</p>
+<p>虽然不那么直观，但是二进制也有它的好处：便于不动脑查表格。按照我们十进制乘法，每一位都有10种可能：千位可能没有，也可能是1000、2000、3000、4000……9000。这样表格上就得留出9个位置。但是二进制乘法下，每一位要么有，要么没有。虽然要拆的次数变成了三倍（还记得为什么是三倍吗），但拆完之后就省事儿了。</p>
+<p>这种计算方式并没有对后代产生很大影响，但每次我们敲出1024的时候，除了<a target="_blank" rel="noopener" href="http://www.guokr.com/article/181723/">达盖尔</a>的旗帜之外，似乎还是值得缅怀一下古埃及人？</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2016/10/24/day1024/" title="你真的懂啥是1024吗？">http://ocnyang.com/2016/10/24/day1024/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/10/11/Gson_Guide4/" rel="prev" title="Gson使用指南（四）">
+      <i class="fa fa-chevron-left"></i> Gson使用指南（四）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/11/03/EffectiveJava/" rel="next" title="《Effective Java》笔记">
+      《Effective Java》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E6%9D%A5%E8%87%AA%E5%B7%A7%E5%90%88%E7%9A%84%E5%8D%95%E4%BD%8D"><span class="nav-number">1.</span> <span class="nav-text">一个来自巧合的单位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%B0%E5%BA%95%E6%98%AF1000%E8%BF%98%E6%98%AF1024%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">到底是1000还是1024？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%85%88%E7%94%A81024%E7%9A%84%E5%8F%AF%E8%83%BD%E6%98%AF%E2%80%A6%E2%80%A6%E5%9F%83%E5%8F%8A%E4%BA%BA%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">最先用1024的可能是……埃及人？</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : '0ec5bfc92d514e835664ac9ea4f142eb',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

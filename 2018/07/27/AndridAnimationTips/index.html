@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Android 动画在开发中是不可或缺的功能，或者说是界面灵动的添加剂。那你是否总结过 Android 中总共为开发者提供了多少种方式的动画呢？今天就为大家总结归纳一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 一共有多少种动画？准确告诉你！">
+<meta property="og:url" content="http://ocnyang.com/2018/07/27/AndridAnimationTips/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="Android 动画在开发中是不可或缺的功能，或者说是界面灵动的添加剂。那你是否总结过 Android 中总共为开发者提供了多少种方式的动画呢？今天就为大家总结归纳一下。">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/FnCS.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/JRYHqwhI.jpg">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_base.png">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_popup1.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_popup2.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_skip1.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_skip2.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_layoutanimation1.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/view_animation_layoutanimation2.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/frame_animation_0.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/frame_animation_1.png">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/27/164db18974b5778f?imageslim">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/fish_animation.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/ripple_effect1.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/ripple_effect2.gif.gif">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/reveal_animation.gif?imageView2/2/w/600">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/reveal_animation2.gif?imageView2/2/w/400">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/reveal_animation3.gif?imageView2/2/w/400">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/t1.gif">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/27/164db189cddc8de3?imageslim">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/27/164db18a129d927b?imageslim">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/27/164db1c99e8a917a?imageslim">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/27/164db18a21e2f850?imageslim">
+<meta property="og:image" content="http://img.shedoor.net/github/androidanimationset/constraintset.gif">
+<meta property="article:published_time" content="2018-07-27T19:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.779Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/github/androidanimationset/FnCS.gif">
+
+<link rel="canonical" href="http://ocnyang.com/2018/07/27/AndridAnimationTips/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Android 一共有多少种动画？准确告诉你！ | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2018/07/27/AndridAnimationTips/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android 一共有多少种动画？准确告诉你！
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-07-27 19:03:15" itemprop="dateCreated datePublished" datetime="2018-07-27T19:03:15+00:00">2018-07-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">Android教程系列</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>5.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="http://img.shedoor.net/github/androidanimationset/FnCS.gif" alt="Android 动画">  </p>
+<p>Android 动画在开发中是不可或缺的功能，或者说是界面灵动的添加剂。那你是否总结过 Android 中总共为开发者提供了多少种方式的动画呢？今天就为大家总结归纳一下。</p>
+<span id="more"></span>
+
+<p><img src="http://img.shedoor.net/github/androidanimationset/JRYHqwhI.jpg" alt="报告老师，我知道">  </p>
+<p>我话音未落，前排那位骚气不减当年、故事布满双眼的大胸弟就激动得高高举起了那只满是老茧的右手：“我知道，我知道！都有平移动画、缩放动画、旋转动画、渐变动画、还有……”  </p>
+<p>看着这位兄弟回答时专注又冥思苦想的表情，我真不忍心伤害他那颗纯真的幼小心灵。于是我决定说一个谎：“这位同学，你说的太对了！你都知道的这么全面了还出来听课真是太辛苦了。这么热的天，不如回家吹吹空调、吃吃西瓜，把这次学习的机会让给更需要的人不挺好吗！”</p>
+<p>看着那位兄弟一脸满足后远去的欢快背影，我终于可以放心的开始今天重点了。好了，上面内容纯属扯淡，转入正题。  </p>
+<blockquote>
+<p>本文章一部分教程图片来自网络，在这里先对这些图片的作者表示感谢。</p>
+</blockquote>
+<h2 id="动画种类"><a href="#动画种类" class="headerlink" title="动画种类"></a>动画种类</h2><p>Android 动画可以归纳为以下几种：  </p>
+<ul>
+<li><a href="#1">视图动画（View 动画）</a></li>
+<li><a href="#2">帧动画（Frame 动画、Drawable 动画）</a></li>
+<li><a href="#3">属性动画</a></li>
+<li><a href="#4">触摸反馈动画（Ripple Effect）</a></li>
+<li><a href="#5">揭露动画（Reveal Effect）</a></li>
+<li><a href="#6">转场动画 &amp; 共享元素（Activity 切换动画）</a></li>
+<li><a href="#7">视图状态动画（Animate View State Changes）</a></li>
+<li><a href="#8">矢量图动画（Vector 动画）</a></li>
+<li><a href="#9">约束布局实现的关键帧动画（ConstraintSet 动画）</a></li>
+</ul>
+<p>上面动画分类是个人通过每种动画种类概念的独立性来划分的，目前能想到的只有这么多，如果有所遗漏大家可以指点出来以供我后续完善。  </p>
+<p>可能有很多人迅速的反应出，缺少了目前使用也相对较多的 <strong><a target="_blank" rel="noopener" href="https://github.com/airbnb/lottie-android">airbnb/lottie-android</a></strong> 动画。不可置疑，Lottie 库目前在 Android 开发中尤其复杂动画效果上地位显著。但我们今天要是的 Android 原生上为我们提供的能使用的动画方式，Lottie 动画今天暂且搁置。同时对于 RecyclerView item 加载动画今天也暂且不提。我们且把这些动画归为其他，并不是把它们遗忘了。  </p>
+<h2 id="详尽教程"><a href="#详尽教程" class="headerlink" title="详尽教程"></a>详尽教程</h2><p>对于上面列举的动画种类，可能大家对部分较常用的动画早已熟练应用，比如 View 动画、属性动画等。而对部分较少使用（比如 揭露动画）、或者常常使用却从未意识到它也属于动画的一种（比如 触摸反馈动画）知道的并不是那么全面。“那么今天就一一为大家详细讲解每种动画的概念”，那是不可能滴~~，就这么点篇幅，这么可能把每种动画都细说下来。  </p>
+<p>要这些动画一一梳理清晰，那将是一项浩大的工作，而我已经为大家总结成了一个<strong>《详尽 Android 动画系列教程》</strong>，大家可以到<br><a target="_blank" rel="noopener" href="https://github.com/OCNYang/Android-Animation-Set">https://github.com/OCNYang/Android-Animation-Set</a><br>进行查看，由于动画知识点涉及的太多而教程详细程度令人发指，大家可以收藏起来慢慢查看。另外总结的教程中每种动画都提供了动画示例，大家可以结合源码细细品味。（上面总结的系列教程，大多数都是借用前人总结的教程，选用的都是针对每种动画网上流传的最详细全面的教程，在梳理中对部分错误也进行了更正。）  </p>
+<p>那今天的任务是什么呢？接下来主要通过粗略的介绍来讲解每种动画在开发中都适用在哪种场景。  </p>
+<h2 id="1">视图动画（View 动画）</h2>  
+
+<p>自从有了属性动画，View 动画的处境就非常凄凉，但有时我们需要的仅仅就是简易的动画效果，那我们使用 View 动画起来就十分便捷。  </p>
+<p>View 动画的一个特点就是，他的动画仅仅是动的 View 的绘制地方，View 真正的位置并没有一起动画。</p>
+<p>View 一般会用作直接作用页面中的 View 上，实现基本的动画效果：平移、旋转、缩放、透明度、或前几者的交集：  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/view_animation_base.png" alt="view_animation_base">  </p>
+<p>除了这几种用法还有几种特殊的使用场景：  </p>
+<ul>
+<li><ol>
+<li><strong>给 PopupWindow 设置显示隐藏的动画效果</strong>：</li>
+</ol>
+</li>
+</ul>
+<p>大家可以对比一下默认动画和设置后的动画效果对比：  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/view_animation_popup1.gif"  width="400px" alt="默认效果"/> <img src="http://img.shedoor.net/github/androidanimationset/view_animation_popup2.gif"  width="400px" alt="自定义效果"/>  </p>
+<ul>
+<li><ol start="2">
+<li><strong>给 Activity 设置页面跳转、退出动画效果</strong>：</li>
+</ol>
+</li>
+</ul>
+<p>Activity 过场动画效果可以通过很多方式设置，而使用 View 动画实现的方式就是借助设置<br><code>overridePendingTransition(int enterAnim, int exitAnim)</code> 方法。跟在 startActivity() 或 finish() 后面，在页面转换时就显示上面方法设置的切换动画效果。  </p>
+<p>效果对比：  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/view_animation_skip1.gif"  width="400px" alt="默认效果"/> <img src="http://img.shedoor.net/github/androidanimationset/view_animation_skip2.gif"  width="400px" alt="自定义效果"/>  </p>
+<ul>
+<li><ol start="3">
+<li><strong>给 ViewGroup 设置子控件的进场动画效果</strong>：  </li>
+</ol>
+</li>
+</ul>
+<p>就是通过给 ViewGroup 控件设置一条 <code>android:layoutAnimation=&quot;@anim/anim_layout&quot;</code> 的属性。而 <code>anim_layout</code> 就是 ViewGroup 中子控件在第一次显示时的进场动画效果。  </p>
+<p>效果如下：  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/view_animation_layoutanimation1.gif"  width="400px" alt="默认效果"/> <img src="http://img.shedoor.net/github/androidanimationset/view_animation_layoutanimation2.gif"  width="400px" alt="自定义效果"/>  </p>
+<blockquote>
+<p>LayoutAnimation 适用于所有的 ViewGroup ，自然也包含 ListView、RecyclerView 等控件。上面说过 LayoutAnimation 提供的是进场动画效果，所以只在 ViewGroup 第一次加载子 View 时显示一次，所以列表控件的 item 加载动画我们一般不使用它，我们会使用 列表 专门的 Item 加载动画， 比如 recyclerView.setItemAnimator() 等。</p>
+</blockquote>
+<h2 id="2">帧动画</h2>  
+
+<p><img src="http://img.shedoor.net/github/androidanimationset/frame_animation_0.gif" alt="动画书">  </p>
+<p>帧动画这个很好理解，其实就和看的动画片一样，每一帧代表一个画面动作，当快速逐帧显示时，速度到达人眼无法分辨每一帧时，就达到了动画的效果。</p>
+<p>在使用中，先要准备好每一帧的素材图片：<br><img src="http://img.shedoor.net/github/androidanimationset/frame_animation_1.png" alt="帧动画素材图">  </p>
+<p>然后播放出来就成了动画的效果：  </p>
+<img src="https://user-gold-cdn.xitu.io/2018/7/27/164db18974b5778f?imageslim"  width="400px" alt="帧动画播放效果"/>  
+
+<p>要说起帧动画的使用场景，在开发中使用的真是少之又少，一般会有两种：  </p>
+<ul>
+<li>设备的开关机动画</li>
+<li> “复杂” 的动画效果，看似不可能完成的动画</li>
+</ul>
+<blockquote>
+<p>之所以说开机动画是帧动画。是因为一般开机动画是通过 system/media/bootanimation.zip 这个压缩包，bootanimation 里面主要包含一个 desc.txt 以及 N 个文件夹。而文件夹里面放着的就是开机动画的图片资源。decs.txt 的作用就是指导系统如何去执行开机动画。<br>desc.txt 编写规范，例如开机动画需要用到 2 个文件夹，分别是 folder1 和 folder2，开机的时候，先把 folder1 里面的图片都播放一遍，然后再循环播放 folder2 里面的文件，直到进入系统。</p>
+</blockquote>
+<p>而在开发中，开机动画我们一般涉及不到的。而常常使用到的是，当我们需要一些比较复杂的图片动画显示效果时，其他动画又实现不了，这时我们可以考虑帧动画，但要注意防止 OOM。<br>其实真正用到帧动画时，更多的时候我们还不如使用 GIF 图片代替，现在几个主流图片加载框架都支持 GIF 图片，同时也能控制 GIF 的播放时机。</p>
+<h2 id="3">属性动画</h2>  
+
+<p>属性动画所提供的功能和 View 动画十分相似。但两者在实现原理上完全不同，而相对 View 动画来说，属性动画要强大的许多。这里我们先对两者做个对比：   </p>
+<p><strong>View 动画/视图动画：</strong>  </p>
+<ol>
+<li>View 动画只能为 View 添加动画效果，且不能监听 View 相关属性的变化过程。</li>
+<li>View 动画提供的动画能力较为单一，目前只支持帧动画、缩放动画、位移动画、旋转动画、透明度动画以及这些动画的集合动画。</li>
+<li>View动画改变的是 View 的绘制效果，View 的真正位置和相关属性并不会改变，这也就造成了点击事件的触发区域是动画前的位置而不是动画后的位置的原因。</li>
+</ol>
+<p><strong>属性动画</strong>  </p>
+<ol>
+<li>属性动画作用对象不局限在 View 上，而是任何提供了 Getter 和 Setter 方法的对象的属性上。</li>
+<li>属性动画没有直接改变 View 状态的能力，而是通过动态改变 View 相关属性的方式来改变 View 的显示效果。</li>
+<li>属性动画使用更方便，可以用更简洁的代码实现相关的动画效果。</li>
+<li>属性动画上手难度较高，对于 propertyName 需要自己去挖掘，或者自己通过 Wrapper 的方式去自定义 propertyName。</li>
+<li>属性动画是 Android3.0 以上系统提供的能力，在 3.0 以下需导入 nineoldandroids 三方库解决兼容性问题。</li>
+</ol>
+<p>那属性动画的使用场景有哪些呢？  </p>
+<ul>
+<li>基本上视图动画作用在 View 上的动画效果，属性动画都可以实现；</li>
+<li>在自定义 View 时，需要实现一些复杂的动画效果，或对 View 的一些特殊属性值进行动画变更时，视图动画无法实现时；</li>
+<li>另外，属性动画你也可以用在非动画场景，比如，你在自定义 View 需要一个有一定规律（根据特定差值器变化）且可监听的数值变化器，这个时候借助属性动画是再合适不过了。</li>
+</ul>
+<p>属性动画是功能更强大、实现方式更优雅的动画解决方案，在为自定义 View 设置动效上有着非常强大的表现能力，可以实现 View 动画实现不了的更加炫酷的动画效果。详细的属性动画介绍可以去查看 《Android 动画详尽教程》系列。</p>
+<p>这里盗一张前段时间有位网友实现的灵动的红鲤鱼效果，具体的实现也用到了不少属性动画的原理。  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/fish_animation.gif" alt="灵动的红鲤鱼">  </p>
+<h2 id="4">触摸反馈动画（Ripple Effect）</h2>  
+
+<p>所谓触摸反馈动画就是一种点击效果，作用在可点击的 View 上时，当有点击事件时会有涟漪般的反馈效果，使用在 按钮 上是再好不过了。  </p>
+<p>Ripple 波纹效果有两种：  </p>
+<pre><code>//有边界
+?android:attr/selectableItemBackground
+//无边界 （要求API21以上）
+?android:attr/selectableItemBackgroundBorderless
+</code></pre>
+<p>效果分别为：</p>
+<img src="http://img.shedoor.net/github/androidanimationset/ripple_effect1.gif"  width="400px" alt="有边界效果"/>  
+<img src="http://img.shedoor.net/github/androidanimationset/ripple_effect2.gif.gif"  width="400px" alt="无边界效果"/>  
+
+<p>使用也非常简单，只要将上面两种效果设置为控件的背景或者前景就好了，同时需要给控件设置点击事件、或把控件设置为可点击 <code>android:clickable=&quot;true&quot;</code>  </p>
+<h2 id="5">揭露动画（Reveal Effect）</h2>  
+
+<p>揭露动画在系统中很常见，就是类似波纹的效果， 从某一个点向四周展开或者从四周向某一点聚合起来。  </p>
+<ul>
+<li>可以用在 Activity 里面的 View 动画效果，用来揭露某个隐藏 View 的显示；*</li>
+<li>也可以使用在 Activity 跳转过渡动画中。</li>
+</ul>
+<p>如下图使用时的一些效果：</p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/reveal_animation.gif?imageView2/2/w/600" alt="显示隐藏View揭露动画">  </p>
+<p>如果加上些 View 动画效果，结合后成这样：  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/reveal_animation2.gif?imageView2/2/w/400" alt="与基础动画效果结合">  </p>
+<p>同时它还可以和下面要说的转场动画结合成下面更酷炫的效果：  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/reveal_animation3.gif?imageView2/2/w/400" alt="与转场动画结合">  </p>
+<p>上面动画效果是：先使用转场动画的共享元素转场，然后再使用揭露动画显示 View。</p>
+<h2 id="6">转场动画 & 共享元素（Activity 切换动画）</h2>  
+
+<p>转场动画听名字就知道它的使用场景了，转场、转场自然是用在场景转换的时候：</p>
+<ul>
+<li>转场效果我们一般用在 Activity 切换时的动画效果上；</li>
+<li>共享元素一般我们使用在转换的前后两个页面有共同元素<sub>[注1]</sub>时；</li>
+<li>同时也可以在 Activity 布局发生场景变化时，让其中的 View 产生相应的过渡动画。</li>
+</ul>
+<blockquote>
+<p>共同元素：并非限制指作用的两个共享元素的状态、大小、显示位置完全相同。而是指两者在页面中要传递的内容相同，比如是从文章列表转到文章详情页面时的相同标题、主图等。如果共享元素的两者是不同的元素，一方面在显示时共享元素在将结束转场完成转换时会有显示的闪动，另一方面，如果两者表达的是不同的元素，用户也会感到很莫名。</p>
+</blockquote>
+<p>话不多说，放上效果图：  </p>
+<img src="http://img.shedoor.net/github/androidanimationset/t1.gif"  width="400px" alt="转场效果"/>  
+<img src="https://user-gold-cdn.xitu.io/2018/7/27/164db189cddc8de3?imageslim"  width="400px" alt="共享元素效果"/>
+
+<h2 id="7">视图状态动画（Animate View State Changes）</h2>  
+
+<p>所谓视图状态动画，就是 View 在状态改变时执行的动画效果。和之前我们通过 selector 选择器给 Button 设置不同状态下的背景效果是一样一样的。  </p>
+<p>当然，它的使用场景也是特定的：  </p>
+<ul>
+<li>当 View 的状态改变时，希望此时显示的效果和静态效果有所区分，即显示效果也做出相应的改变，比如 Z 轴抬高，大小改变、或其他动画效果等。</li>
+</ul>
+<p>放上一个按钮被点击后设置的视图状态动画：  </p>
+<img src="https://user-gold-cdn.xitu.io/2018/7/27/164db18a129d927b?imageslim"  width="400px" alt="视图状态动画"/>
+
+<h2 id="8">矢量图动画（Vector 动画）</h2>  
+
+<p>不知道大家现在在开发中，在图标显示上是不是还在切各种尺寸的 .png 图片适配。现在我可是一直在使用 svg 图标（在开发中是通过<a target="_blank" rel="noopener" href="http://inloop.github.io/svg2android/">转换成 Vector </a>再使用，现在 AS 中导入，可以自动完成转换，转换不成功的再用上面网址转换），svg 图标的好处自不用说了。那矢量图动画有是怎么回事呢？  </p>
+<p>VectorDrawable 一般是以 <vector> 为根标签定义的 XML 文件，<vector>、<group>、<clip-path>、<path> 元素都有各自可以播放动画的属性。具体怎么生成具有动画效果的图标，可以在<a target="_blank" rel="noopener" href="https://github.com/OCNYang/Android-Animation-Set">系列教程</a>中查看。  </p>
+<p>我们可以在以下场景使用：  </p>
+<ul>
+<li>具有动态变换效果的图标；</li>
+<li>也可以用在需要特定动画效果的 VectorDrawable 图片上。</li>
+</ul>
+<img src="https://user-gold-cdn.xitu.io/2018/7/27/164db1c99e8a917a?imageslim"  width="400px" alt="动态图标"/>  
+<img src="https://user-gold-cdn.xitu.io/2018/7/27/164db18a21e2f850?imageslim"  width="400px" alt="奔跑的图钉"/>
+
+
+<h2 id="9">约束布局实现的关键帧动画（ConstraintSet 动画）</h2>  
+
+<p>这个动画就比较新了，甚至连官方都没有提供完整的文档。这是通过 ConstraintLayout 实现的一种关键帧动画。</p>
+<blockquote>
+<p><strong>关键帧动画</strong>：(百度百科)任何动画要表现运动或变化，至少前后要给出两个不同的关键状态，而中间状态的变化和衔接电脑可以自动完成，在 Flash 中，表示关键状态的帧动画叫做关键帧动画<br>所谓关键帧动画，就是给需要动画效果的属性，准备一组与时间相关的值，这些值都是在动画序列中比较关键的帧中提取出来的，而其他时间帧中的值，可以用这些关键值，采用特定的插值方法计算得到，从而达到比较流畅的动画效果。  </p>
+</blockquote>
+<p>而 ConstraintSet 动画既然实现的是关键帧动画，那至少需要两个关键帧，而对于 ConstraintSet 来说每次需要的两个关键帧就是两种布局状态，而两种布局状态的转变过程 ConstraintSet 会生成一定的动画过渡。  </p>
+<p>那使用场景根据约束动画的说明也比较明显了，就是同一个布局需要重新调整布局内部 View 位置时使用。  </p>
+<p><img src="http://img.shedoor.net/github/androidanimationset/constraintset.gif" alt="约束布局动画">  </p>
+<h2 id="更详细的动画介绍"><a href="#更详细的动画介绍" class="headerlink" title="更详细的动画介绍"></a>更详细的动画介绍</h2><p>这里介绍的只是对 Android 各个种类的动画进行了一个简单的介绍，如果你要更加详细更加全面的查看 Android 各个动画的系列教程，可以到本文章同系列文章教程进行查看：  </p>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/OCNYang/Android-Animation-Set">Android 动画详尽教程：https://github.com/OCNYang/Android-Animation-Set</a></strong>  </p>
+<p>本篇教程终于完了，这时我又想起了文章开头那个大胸弟，我想他此刻肯定在家正洋洋得意的啃着大西瓜。不多说了，如此炎热的天气，我也要去啃个西瓜抚慰一下狂躁的心。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2018/07/27/AndridAnimationTips/" title="Android 一共有多少种动画？准确告诉你！">http://ocnyang.com/2018/07/27/AndridAnimationTips/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/23/AndroidAnimationDetailedTutorial/" rel="prev" title="Android Animation Detailed Tutorial / Android 动画详尽教程">
+      <i class="fa fa-chevron-left"></i> Android Animation Detailed Tutorial / Android 动画详尽教程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/20/hello-world/" rel="next" title="Hello World">
+      Hello World <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E7%94%BB%E7%A7%8D%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">动画种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E5%B0%BD%E6%95%99%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">详尽教程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1"><span class="nav-number">3.</span> <span class="nav-text">视图动画（View 动画）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2"><span class="nav-number">4.</span> <span class="nav-text">帧动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3"><span class="nav-number">5.</span> <span class="nav-text">属性动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4"><span class="nav-number">6.</span> <span class="nav-text">触摸反馈动画（Ripple Effect）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5"><span class="nav-number">7.</span> <span class="nav-text">揭露动画（Reveal Effect）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6"><span class="nav-number">8.</span> <span class="nav-text">转场动画 &amp; 共享元素（Activity 切换动画）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7"><span class="nav-number">9.</span> <span class="nav-text">视图状态动画（Animate View State Changes）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8"><span class="nav-number">10.</span> <span class="nav-text">矢量图动画（Vector 动画）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9"><span class="nav-number">11.</span> <span class="nav-text">约束布局实现的关键帧动画（ConstraintSet 动画）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E8%AF%A6%E7%BB%86%E7%9A%84%E5%8A%A8%E7%94%BB%E4%BB%8B%E7%BB%8D"><span class="nav-number">12.</span> <span class="nav-text">更详细的动画介绍</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : '341cbc28a117a21620a46187b8a20a9f',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

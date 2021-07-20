@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、概述近期注意到QQ新版使用了沉浸式状态栏，ok，先声明一下：本篇博客效果下图：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="沉浸式状态栏攻略">
+<meta property="og:url" content="http://ocnyang.com/2016/08/19/TranslucentBars/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="一、概述近期注意到QQ新版使用了沉浸式状态栏，ok，先声明一下：本篇博客效果下图：">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/1.jpg">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/2.gif">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/3.gif">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/4.gif">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/5.jpg">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/6.jpg">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/7.jpg">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/8.png">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/9.gif">
+<meta property="og:image" content="http://img.shedoor.net/Immersivemenubar/10.gif">
+<meta property="article:published_time" content="2016-08-19T17:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.783Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Android教程系列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/Immersivemenubar/1.jpg">
+
+<link rel="canonical" href="http://ocnyang.com/2016/08/19/TranslucentBars/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>沉浸式状态栏攻略 | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2016/08/19/TranslucentBars/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          沉浸式状态栏攻略
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-08-19 17:03:15" itemprop="dateCreated datePublished" datetime="2016-08-19T17:03:15+00:00">2016-08-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">Android教程系列</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p>近期注意到QQ新版使用了沉浸式状态栏，ok，先声明一下：本篇博客效果下图：</p>
+<p><img src="http://img.shedoor.net/Immersivemenubar/1.jpg">  </p>
+<span id="more"></span>
+
+<p>关于这个状态栏变色到底叫「Immersive Mode」/「Translucent Bars」有兴趣可以去 <a target="_blank" rel="noopener" href="http://www.zhihu.com/question/27040217">为什么在国内会有很多用户把 ｢透明栏｣（Translucent Bars）称作 ｢沉浸式顶栏｣？</a>上面了解了解.</p>
+<p>恩，接下来正题。  </p>
+<p>首先只有大于等于4.4版本支持这个半透明状态栏的效果，但是4.4和5.0的显示效果有一定的差异，所有本篇博文内容为：</p>
+<ul>
+<li>如何实现半透明状态栏效果在大于4.4版本之上。</li>
+<li>如何让4.4的效果与5.0的效果尽可能一致。  </li>
+</ul>
+<p>看了不少参考文章，都介绍到这个库，大家可以了解：<a target="_blank" rel="noopener" href="https://github.com/jgilfelt/SystemBarTint">SystemBarTint</a>。</p>
+<p>不过本篇博文并未基于此库，自己想了个hack，对于此库源码有空再看了。</p>
+<h2 id="二、效果图"><a href="#二、效果图" class="headerlink" title="二、效果图"></a>二、效果图</h2><p>先贴下效果图，以便和实现过程中做下对比</p>
+<ul>
+<li>4.4 模拟器</li>
+</ul>
+<p><img src="http://img.shedoor.net/Immersivemenubar/2.gif">  </p>
+<ul>
+<li>5.x 真机  </li>
+</ul>
+<p><img src="http://img.shedoor.net/Immersivemenubar/3.gif">  </p>
+<p>贴个如果顶部是图片的效果图，其实是一样的，为了方便我就放侧栏的顶部了。</p>
+<p><img src="http://img.shedoor.net/Immersivemenubar/4.gif"></p>
+<p>ok，有了效果图之后就开始看实现了。</p>
+<h2 id="三、实现半透明状态栏"><a href="#三、实现半透明状态栏" class="headerlink" title="三、实现半透明状态栏"></a>三、实现半透明状态栏</h2><p>因为本例使用了NavigationView，所以布局代码稍多，当然如果你不需要，可以自己进行筛减。</p>
+<p>注意引入相关依赖：</p>
+<pre><code>Java
+
+ compile &#39;com.android.support:appcompat-v7:22.2.1&#39;
+ compile &#39;com.android.support:support-v4:22.2.1&#39;
+ compile &#39;com.android.support:design:22.2.0&#39;
+</code></pre>
+<h3 id="（一）colors-xml-和-styles-xml"><a href="#（一）colors-xml-和-styles-xml" class="headerlink" title="（一）colors.xml 和 styles.xml"></a>（一）colors.xml 和 styles.xml</h3><p>首先我们定义几个颜色：</p>
+<p>res/values/color.xml</p>
+<pre><code>XHTML
+
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;resources&gt;
+    &lt;color name=&quot;primary&quot;&gt;#FF03A9F4&lt;/color&gt;
+    &lt;color name=&quot;primary_dark&quot;&gt;#FF0288D1&lt;/color&gt;
+    &lt;color name=&quot;status_bar_color&quot;&gt;@color/primary_dark&lt;/color&gt;
+&lt;/resources&gt;
+</code></pre>
+<p>下面定义几个styles.xml</p>
+<p>注意文件夹的路径：</p>
+<p>values/styles.xml</p>
+<pre><code>XHTML
+
+&lt;resources&gt;
+    &lt;style name=&quot;BaseAppTheme&quot; parent=&quot;Theme.AppCompat.Light.NoActionBar&quot;&gt;
+        &lt;!-- Customize your theme here. --&gt;
+        &lt;item name=&quot;colorPrimary&quot;&gt;@color/primary&lt;/item&gt;
+        &lt;item name=&quot;colorPrimaryDark&quot;&gt;@color/primary_dark&lt;/item&gt;
+        &lt;item name=&quot;colorAccent&quot;&gt;#FF4081&lt;/item&gt;
+    &lt;/style&gt;
+
+    &lt;!-- Base application theme. --&gt;
+    &lt;style name=&quot;AppTheme&quot; parent=&quot;@style/BaseAppTheme&quot;&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;
+</code></pre>
+<p>values-v19</p>
+<pre><code>XHTML
+
+&lt;resources&gt;
+    &lt;style name=&quot;AppTheme&quot; parent=&quot;@style/BaseAppTheme&quot;&gt;
+        &lt;item name=&quot;android:windowTranslucentStatus&quot;&gt;true&lt;/item&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;
+</code></pre>
+<p>ok，这个没撒说的。注意我们的主题是基于NoActionBar的，android:windowTranslucentStatus这个属性是v19开始引入的。</p>
+<h3 id="（二）布局文件"><a href="#（二）布局文件" class="headerlink" title="（二）布局文件"></a>（二）布局文件</h3><p>activity_main.xml</p>
+<pre><code>XHTML
+
+&lt;android.support.v4.widget.DrawerLayout
+    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;
+    xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    &gt;
+
+    &lt;LinearLayout
+        android:id=&quot;@+id/id_main_content&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;
+        android:orientation=&quot;vertical&quot;&gt;
+
+        &lt;android.support.v7.widget.Toolbar
+            android:id=&quot;@+id/id_toolbar&quot;
+            android:layout_width=&quot;match_parent&quot;
+            android:layout_height=&quot;wrap_content&quot;
+            android:background=&quot;?attr/colorPrimary&quot;
+            android:fitsSystemWindows=&quot;true&quot;
+            app:popupTheme=&quot;@style/ThemeOverlay.AppCompat.Light&quot;/&gt;
+
+        &lt;TextView
+            android:id=&quot;@+id/id_tv_content&quot;
+            android:layout_width=&quot;match_parent&quot;
+            android:layout_height=&quot;0dp&quot;
+            android:layout_weight=&quot;1&quot;
+            android:gravity=&quot;center&quot;
+            android:text=&quot;HelloWorld&quot;
+            android:textSize=&quot;30sp&quot;/&gt;
+    &lt;/LinearLayout&gt;
+
+    &lt;android.support.design.widget.NavigationView
+        android:id=&quot;@+id/id_nv_menu&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;
+        android:layout_gravity=&quot;start&quot;
+        android:fitsSystemWindows=&quot;true&quot;
+        app:headerLayout=&quot;@layout/header_just_username&quot;
+        app:menu=&quot;@menu/menu_drawer&quot;
+        /&gt;
+&lt;/android.support.v4.widget.DrawerLayout&gt;
+</code></pre>
+<p>DrawerLayout内部一个LinearLayout作为内容区域，一个NavigationView作为菜单。<br>注意下Toolbar的高度设置为wrap_content。</p>
+<p>然后我们的NavigationView中又依赖一个布局文件和一个menu的文件。</p>
+<p>header_just_username.xml</p>
+<pre><code>XHTML
+
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+                android:layout_width=&quot;match_parent&quot;
+                android:layout_height=&quot;192dp&quot;
+                android:background=&quot;?attr/colorPrimaryDark&quot;
+                android:orientation=&quot;vertical&quot;
+                android:padding=&quot;16dp&quot;
+                android:fitsSystemWindows=&quot;true&quot;
+                android:theme=&quot;@style/ThemeOverlay.AppCompat.Dark&quot;&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/id_link&quot;
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_alignParentBottom=&quot;true&quot;
+        android:layout_marginBottom=&quot;16dp&quot;
+        android:text=&quot;http://blog.csdn.net/lmj623565791&quot;/&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/id_username&quot;
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_above=&quot;@id/id_link&quot;
+        android:text=&quot;Zhang Hongyang&quot;/&gt;
+
+    &lt;ImageView
+        android:layout_width=&quot;72dp&quot;
+        android:layout_height=&quot;72dp&quot;
+        android:layout_above=&quot;@id/id_username&quot;
+        android:layout_marginBottom=&quot;16dp&quot;
+        android:src=&quot;@mipmap/ic_launcher&quot;/&gt;
+
+&lt;/RelativeLayout&gt;
+</code></pre>
+<p>menu的文件就不贴了，更加详细的可以去参考Android 自己实现 NavigationView [Design Support Library(1)]。</p>
+<p>大体看完布局文件以后，有几个点要特别注意：</p>
+<ul>
+<li>ToolBar高度设置为wrap_content</li>
+<li>ToolBar添加属性android:fitsSystemWindows=”true”</li>
+<li>header_just_username.xml的跟布局RelativeLayout，添加属性android:fitsSystemWindows=”true”  </li>
+</ul>
+<p>android:fitsSystemWindows这个属性，主要是通过调整当前设置这个属性的view的padding去为我们的status_bar留下空间。</p>
+<p>根据上面的解释，如果你不写，那么状态栏和Toolbar就会有挤一块的感觉了，类似会这样：</p>
+<p><img src="http://img.shedoor.net/Immersivemenubar/5.jpg">  </p>
+<p>ok，最后看下代码。</p>
+<h3 id="（三）Activity的代码"><a href="#（三）Activity的代码" class="headerlink" title="（三）Activity的代码"></a>（三）Activity的代码</h3><pre><code>Java
+
+package com.zhy.colorfulstatusbar;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
+public class MainActivity extends AppCompatActivity
+&#123;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    &#123;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.id_toolbar);
+        setSupportActionBar(toolbar);
+        //StatusBarCompat.compat(this, getResources().getColor(R.color.status_bar_color));
+        //StatusBarCompat.compat(this);
+    &#125;
+
+&#125;
+</code></pre>
+<p>没撒说的，就是setSupportActionBar。</p>
+<ul>
+<li>那么现在4.4的效果图是：</li>
+</ul>
+<p><img src="http://img.shedoor.net/Immersivemenubar/6.jpg">  </p>
+<p>其实还不错，有个渐变的效果。</p>
+<ul>
+<li>现在5.x的效果：</li>
+</ul>
+<p><img src="http://img.shedoor.net/Immersivemenubar/7.jpg"></p>
+<p>可以看到5.x默认并非是一个渐变的效果，类似是一个深一点的颜色。</p>
+<p>在看看我们md的规范</p>
+<p><img src="http://img.shedoor.net/Immersivemenubar/8.png"></p>
+<p>状态栏应该是一个比Toolbar背景色，稍微深一点的颜色。</p>
+<p>这么看来，我们还是有必要去为4.4做点适配工作，让其竟可能和5.x显示效果一致，或者说尽可能符合md的规范。</p>
+<h2 id="四、调整4-4的显示方案"><a href="#四、调整4-4的显示方案" class="headerlink" title="四、调整4.4的显示方案"></a>四、调整4.4的显示方案</h2><p>那么问题来了？如何做呢？</p>
+<p>咱们这么看，4.4之后加入windowTranslucentStatus的属性之后，也就是我们可以用到状态栏的区域了。</p>
+<p>既然我们可以用到这块区域，那么我们只要在根布局去设置一个与状态栏等高的View，设置背景色为我们期望的颜色就可以了。</p>
+<p>于是有了以下的代码：</p>
+<pre><code>Java
+
+package com.zhy.colorfulstatusbar;
+
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
+import android.view.View;
+import android.view.ViewGroup;
+
+/**
+ * Created by zhy on 15/9/21.
+ */
+public class StatusBarCompat
+&#123;
+    private static final int INVALID_VAL = -1;
+    private static final int COLOR_DEFAULT = Color.parseColor(&quot;#20000000&quot;);
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void compat(Activity activity, int statusColor)
+    &#123;
+
+        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP)
+        &#123;
+            if (statusColor != INVALID_VAL)
+            &#123;
+                activity.getWindow().setStatusBarColor(statusColor);
+            &#125;
+            return;
+        &#125;
+
+        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.KITKAT &amp;&amp; Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.LOLLIPOP)
+        &#123;
+            int color = COLOR_DEFAULT;
+            ViewGroup contentView = (ViewGroup) activity.findViewById(android.R.id.content);
+            if (statusColor != INVALID_VAL)
+            &#123;
+                color = statusColor;
+            &#125;
+            View statusBarView = new View(activity);
+            ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    getStatusBarHeight(activity));
+            statusBarView.setBackgroundColor(color);
+            contentView.addView(statusBarView, lp);
+        &#125;
+
+    &#125;
+
+    public static void compat(Activity activity)
+    &#123;
+        compat(activity, INVALID_VAL);
+    &#125;
+
+    public static int getStatusBarHeight(Context context)
+    &#123;
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier(&quot;status_bar_height&quot;, &quot;dimen&quot;, &quot;android&quot;);
+        if (resourceId &gt; 0)
+        &#123;
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        &#125;
+        return result;
+    &#125;
+&#125;
+</code></pre>
+<p>代码的思路很简单，根据Activity找到android.R.content，在其中添加一个View(高度为statusbarHeight，背景色为我们设置的颜色，默认为半透明的黑色)。</p>
+<p>那么只需要在Activity里面去写上：</p>
+<pre><code>Java
+
+StatusBarCompat.compat(this);
+</code></pre>
+<p>就可以了。</p>
+<p>如果你希望自己设置状态看颜色，那么就用这个方法：</p>
+<pre><code>Java
+
+StatusBarCompat.compat(this, getResources().getColor(R.color.status_bar_color));
+</code></pre>
+<p>这样的话我们就解决了4.4到5.x的适配问题，一行代码解决，感觉还是不错的。</p>
+<p>最后提一下，对于5.0由于提供了setStatusBarColor去设置状态栏颜色，但是这个方法不能在主题中设置windowTranslucentStatus属性。所以，可以编写一个value-v21文件夹，里面styles.xml写入：</p>
+<pre><code>XHTML
+
+&lt;resources&gt;
+    &lt;!-- Base application theme. --&gt;
+    &lt;style name=&quot;AppTheme&quot; parent=&quot;@style/BaseAppTheme&quot;&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;
+</code></pre>
+<p>其实就是不要有windowTranslucentStatus属性。</p>
+<p>接下来，对于默认的效果就不测试了，参考上面的效果图。</p>
+<p>我们测试个设置状态栏颜色的，我们这里设置个红色。</p>
+<ul>
+<li>4.4 模拟器  </li>
+</ul>
+<p><img src="http://img.shedoor.net/Immersivemenubar/9.gif"></p>
+<ul>
+<li>5.x 真机  </li>
+</ul>
+<p><img src="http://img.shedoor.net/Immersivemenubar/10.gif"></p>
+<p>ok，这样就结束啦~~</p>
+<p>源码地址:<a target="_blank" rel="noopener" href="https://github.com/hongyangAndroid/ColorfulStatusBar">https://github.com/hongyangAndroid/ColorfulStatusBar</a></p>
+<p>参考</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://blog.raffaeu.com/archive/2015/04/11/android-and-the-transparent-status-bar.aspx">http://blog.raffaeu.com/archive/2015/04/11/android-and-the-transparent-status-bar.aspx</a></li>
+<li><a target="_blank" rel="noopener" href="https://mindofaandroiddev.wordpress.com/2013/12/28/making-the-status-bar-and-navigation-bar-transparent-with-a-listview-on-android-4-4-kitkat/">https://mindofaandroiddev.wordpress.com/2013/12/28/making-the-status-bar-and-navigation-bar-transparent-with-a-listview-on-android-4-4-kitkat/</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2014/1117/1992.html">http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2014/1117/1992.html</a>  </li>
+<li><a target="_blank" rel="noopener" href="http://developer.android.com/intl/zh-cn/reference/android/view/View.html#attr_android:fitsSystemWindows">http://developer.android.com/intl/zh-cn/reference/android/view/View.html#attr_android:fitsSystemWindows</a>  </li>
+</ul>
+<blockquote>
+<p>原文出处： <a target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/48649563">鸿洋</a>   </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2016/08/19/TranslucentBars/" title="沉浸式状态栏攻略">http://ocnyang.com/2016/08/19/TranslucentBars/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              <a href="/tags/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" rel="tag"><i class="fa fa-tag"></i> Android教程系列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/18/FragmentCreateWay/" rel="prev" title="Fragment的标准写法">
+      <i class="fa fa-chevron-left"></i> Fragment的标准写法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/22/ListViewAttribute/" rel="next" title="ListView 特殊属性 & 常见问题">
+      ListView 特殊属性 & 常见问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一、概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%95%88%E6%9E%9C%E5%9B%BE"><span class="nav-number">2.</span> <span class="nav-text">二、效果图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8D%8A%E9%80%8F%E6%98%8E%E7%8A%B6%E6%80%81%E6%A0%8F"><span class="nav-number">3.</span> <span class="nav-text">三、实现半透明状态栏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%80%EF%BC%89colors-xml-%E5%92%8C-styles-xml"><span class="nav-number">3.1.</span> <span class="nav-text">（一）colors.xml 和 styles.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%BA%8C%EF%BC%89%E5%B8%83%E5%B1%80%E6%96%87%E4%BB%B6"><span class="nav-number">3.2.</span> <span class="nav-text">（二）布局文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%89%EF%BC%89Activity%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="nav-number">3.3.</span> <span class="nav-text">（三）Activity的代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%B0%83%E6%95%B44-4%E7%9A%84%E6%98%BE%E7%A4%BA%E6%96%B9%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text">四、调整4.4的显示方案</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : '677338103964af4eab8da18260fca1ed',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

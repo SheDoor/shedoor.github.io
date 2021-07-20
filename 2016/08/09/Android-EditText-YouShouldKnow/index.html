@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Android上有很多输入法应用，每种输入法都有各自的特点，输入法多数时候是和EditText配合使用，结合我自己的亲身实践分享一下使用EditText过程中遇到的一些问题及解决方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EditText的使用及值得注意的地方">
+<meta property="og:url" content="http://ocnyang.com/2016/08/09/Android-EditText-YouShouldKnow/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="Android上有很多输入法应用，每种输入法都有各自的特点，输入法多数时候是和EditText配合使用，结合我自己的亲身实践分享一下使用EditText过程中遇到的一些问题及解决方法。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-08-09T10:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.779Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android控件">
+<meta property="article:tag" content="EditText">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://ocnyang.com/2016/08/09/Android-EditText-YouShouldKnow/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>EditText的使用及值得注意的地方 | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2016/08/09/Android-EditText-YouShouldKnow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EditText的使用及值得注意的地方
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-08-09 10:03:15" itemprop="dateCreated datePublished" datetime="2016-08-09T10:03:15+00:00">2016-08-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android%E6%8E%A7%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">Android控件</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Android上有很多输入法应用，每种输入法都有各自的特点，输入法多数时候是和EditText配合使用，结合我自己的亲身实践分享一下使用EditText过程中遇到的一些问题及解决方法。</p>
+<span id="more"></span>
+
+<hr>
+<h3 id="设置默认输入法"><a href="#设置默认输入法" class="headerlink" title="设置默认输入法"></a>设置默认输入法</h3><p>有时候为了提高用户体验，在弹出输入法时需要设置默认的输入状态，比如单词应用弹出输入法时，输入法最好是在英文输入状态下。如果是字典应用，弹出输入法时最好是在中文输入状态下，Android并没有提供设置默认的输入状态的接口，但我们可以通过如下方法一样能够达到想要的效果：</p>
+<p><strong>默认中文：</strong></p>
+<p>mEditText.setInputType(EditorInfo.TYPE_CLASS_TEXT);</p>
+<p><strong>默认英文：</strong></p>
+<p>mEditText.setInputType(EditorInfo.TYPE_TEXT_VARIATION_URI);</p>
+<h3 id="打开和关闭输入法"><a href="#打开和关闭输入法" class="headerlink" title="打开和关闭输入法"></a>打开和关闭输入法</h3><p>手动控制输入法的开关状态也能提升用户体验，比如：</p>
+<ul>
+<li>有的搜索框会有一个清除按钮，点击清除按钮时就应该弹出输入法，因为用户清除搜索内容的目的多数时候是需要输入新的内容；</li>
+<li>执行搜索时应该隐藏输入法，因为显示输入法时会遮挡搜索结果，用户体验不太好；</li>
+<li>闹钟来时或者有其它window弹出时应该隐藏输入法，因为输入法也是window，如果不隐藏可能导致输入法遮挡住了其它window等用户体验不太友好的问题。</p></li>
+</ul>
+<p><strong>打开输入法：</strong></p>
+<pre><code>private void open(Context context, View editText) &#123;
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.showSoftInput(editText, 0);
+    &#125;
+</code></pre>
+<p><strong>关闭输入法：</strong></p>
+<pre><code>private void close(Context context,View editText)&#123;
+    InputMethodManager inputMethodManager = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+    inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(),0);
+</code></pre>
+<p>}</p>
+<h3 id="监听EditText的输入状态"><a href="#监听EditText的输入状态" class="headerlink" title="监听EditText的输入状态"></a>监听EditText的输入状态</h3><ul>
+<li>类似新浪微博，在输入内容时会提示还可以输入多少字；</li>
+<li>有的搜索引擎，输入内容时实时显示搜索结果；</li>
+<li>有的输入框有输入长度限制，输入内容超过长度限制时弹出提示信息。</li>
+</ul>
+<p>上面这些都可以通过监听EditText的输入状态来实现，具体实现方式如下：</p>
+<pre><code>mInputEditTxt.addTextChangedListener(newTextWatcher()&#123;
+    @Override
+    publicvoidbeforeTextChanged(CharSequences,intstart,intcount,intafter)&#123;
+
+    &#125;
+
+    @Override
+    publicvoidonTextChanged(CharSequences,intstart,intbefore,intcount)&#123;
+        System.out.println(&quot;监听EditText输入内容的变化，在这里可以监听输入内容的长度。&quot;);
+    &#125;
+
+    @Override
+    publicvoidafterTextChanged(Editables)&#123;
+        System.out.println(&quot;这里可以实现所输即所得，用户输入的同时可以立即在这里根据输入内容执行操作，显示搜索结果！&quot;);
+    &#125;
+&#125;);
+</code></pre>
+<h3 id="监听输入法中的回车按钮"><a href="#监听输入法中的回车按钮" class="headerlink" title="监听输入法中的回车按钮"></a>监听输入法中的回车按钮</h3><p>比如搜狗输入法的右下角有一个回车按钮，我们希望用户点击它时也执行确认功能，可以通过监听EditText的按键点击事件来实现：</p>
+<pre><code>/**
+ * 监听输入法按键
+ *
+ * */
+mInputEditTxt.setOnKeyListener(newOnKeyListener()&#123;
+    @Override
+    publicbooleanonKey(Viewv,intkeyCode,KeyEvent event)&#123;
+        if(keyCode == KeyEvent.KEYCODE_ENTER &amp;&amp; event.getAction() == KeyEvent.ACTION_UP)&#123;
+            System.out.println(&quot;手指弹起时执行确认功能&quot;);
+            returntrue;
+        &#125;
+
+        returnfalse;
+    &#125;
+&#125;);
+</code></pre>
+<h3 id="改变输入法中回车按钮的显示内容"><a href="#改变输入法中回车按钮的显示内容" class="headerlink" title="改变输入法中回车按钮的显示内容"></a>改变输入法中回车按钮的显示内容</h3><p>如果回车按钮是执行搜索功能，则回车按钮上显示”搜索”，如果是执行发送功能，则显示”发送”,如果是下一步，则显示”下一步”。</p>
+<p>实现这个功能需要调用EditText的setImeOptions方法：</p>
+<pre><code>/**
+*
+* IME_ACTION_SEARCH 搜索
+* IME_ACTION_SEND 发送
+* IME_ACTION_NEXT 下一步
+* IME_ACTION_DONE 完成
+*/
+mInputEditTxt.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+</code></pre>
+<h3 id="限制输入内容"><a href="#限制输入内容" class="headerlink" title="限制输入内容"></a>限制输入内容</h3><p>有时候我们根本就不想用户输入一些杂七杂八的内容，因为这需要程序针对输入的内容做各种处理，如果处理不当还会有好多不可预见的问题，索性在输入内容时就禁止用户输入一些非法字符，这可以通过下面的方式实现，新建一个类InputTxtFilter：</p>
+<pre><code>publicclassInputTxtFilter&#123;
+publicstaticfinalintINPUT_TYPE_EN = 0x01;
+publicstaticfinalintINPUT_TYPE_CH = 0x02;
+privatestaticfinalString[]SPELL = newString[]&#123;
+    &quot;a&quot;,&quot;b&quot;,&quot;c&quot;,&quot;d&quot;,&quot;e&quot;,&quot;f&quot;,&quot;g&quot;,&quot;h&quot;,&quot;i&quot;,&quot;j&quot;,&quot;k&quot;,&quot;l&quot;,&quot;m&quot;,&quot;n&quot;,&quot;o&quot;,&quot;p&quot;,&quot;q&quot;,&quot;r&quot;,&quot;s&quot;,&quot;t&quot;,&quot;u&quot;,&quot;v&quot;,&quot;w&quot;,&quot;x&quot;,&quot;y&quot;,&quot;z&quot;,
+    &quot;ā&quot;,&quot;á&quot;,&quot;ǎ&quot;,&quot;à&quot;,&quot;ō&quot;,&quot;ó&quot;,&quot;ǒ&quot;,&quot;ò&quot;,&quot;ē&quot;,&quot;é&quot;,&quot;ě&quot;,&quot;è&quot;,&quot;ī&quot;,&quot;í&quot;,&quot;ǐ&quot;,&quot;ì&quot;,&quot;ū&quot;,&quot;ú&quot;,&quot;ǔ&quot;,&quot;ù&quot;,&quot;ǖ&quot;,&quot;ǘ&quot;,&quot;ǚ&quot;,&quot;ǜ&quot;,&quot;ü&quot;
+&#125;;
+privatestaticchar[]chineseParam = newchar[]&#123;&#39;」&#39;,&#39;，&#39;,&#39;。&#39;,&#39;？&#39;,&#39;…&#39;,&#39;：&#39;,&#39;～&#39;,&#39;【&#39;,&#39;＃&#39;,&#39;、&#39;,&#39;％&#39;,&#39;＊&#39;,&#39;＆&#39;,&#39;＄&#39;,&#39;（&#39;,&#39;‘&#39;,&#39;’&#39;,&#39;“&#39;,&#39;”&#39;,&#39;『&#39;,&#39;〔&#39;,&#39;｛&#39;,&#39;【&#39;
+    ,&#39;￥&#39;,&#39;￡&#39;,&#39;‖&#39;,&#39;〖&#39;,&#39;《&#39;,&#39;「&#39;,&#39;》&#39;,&#39;〗&#39;,&#39;】&#39;,&#39;｝&#39;,&#39;〕&#39;,&#39;』&#39;,&#39;”&#39;,&#39;）&#39;,&#39;！&#39;,&#39;；&#39;,&#39;—&#39;&#125;;
+
+privateInputTxtFilter()&#123;
+
+&#125;
+
+publicstaticvoidinputFilter(finalContext context,finalEditText editText,finalinttype,finalintinputLimit)&#123;
+    InputFilter[]filters = newInputFilter[1];
+    filters[0] = newInputFilter.LengthFilter(inputLimit)&#123;
+        publicCharSequence filter(CharSequence source,intstart,intend,Spanned dest,intdstart,intdend)&#123;
+            booleanisRightCharater = false;
+            if(type == INPUT_TYPE_EN)&#123;
+                isRightCharater = isLetter(source.toString());
+            &#125;elseif(type == INPUT_TYPE_CH)&#123;
+                isRightCharater = isChineseWord(source.toString());
+            &#125;
+
+            if( !isRightCharater|| dest.toString().length()&gt;=inputLimit)&#123;
+                return&quot;&quot;;
+            &#125;
+
+            returnsource;
+        &#125;
+    &#125;;
+    editText.setFilters(filters);
+&#125;
+
+/**
+ * 检测String是否全是中文
+ *
+ */
+publicstaticbooleanisChineseWord(Stringname)&#123;
+    booleanres=true;
+    char[]cTemp = name.toCharArray();
+
+    for(inti = 0;i &lt; name.length();i++ )&#123;
+        if( !isChinese(cTemp[i]))&#123;
+            res=false;
+            break;
+        &#125;
+    &#125;
+
+    returnres;
+&#125;
+
+/**
+ * 是否为英文字母
+ *
+ * */
+publicstaticbooleanisLetter(StringinputStr)&#123;
+    char[]inputArray = inputStr.toCharArray();
+    List&lt;String&gt;spellList = Arrays.asList(SPELL);
+
+    for(charinput : inputArray)&#123;
+        if( !spellList.contains(input + &quot;&quot;))&#123;
+            returnfalse;
+        &#125;
+    &#125;
+
+    returntrue;
+&#125;
+
+/**
+ * 判定输入汉字
+ * @param c
+ */
+publicstaticbooleanisChinese(charc)&#123;
+    for(charparam : chineseParam)&#123;
+        if(param == c)&#123;
+            returnfalse;
+        &#125;
+    &#125;
+
+    Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+    if(ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+        || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+        || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+        || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION
+        || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+        || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS)&#123;
+        returntrue;
+    &#125;
+
+    returnfalse;
+&#125;
+</code></pre>
+<p>}</p>
+<p>在初始化EditText时，调用InputTxtFilter的inputFilter方法，传入输入长度限制、输入内容的类型限制等即可，eg：</p>
+<pre><code>InputTxtFilter.inputFilter(this,mInputEditTxt,InputTxtFilter.INPUT_TYPE_EN,5);
+</code></pre>
+<h3 id="屏蔽EditText的复制、粘贴功能"><a href="#屏蔽EditText的复制、粘贴功能" class="headerlink" title="屏蔽EditText的复制、粘贴功能"></a>屏蔽EditText的复制、粘贴功能</h3><p>在低版本的Android SDK中，如果对EditText的输入长度有限制时，长按EditText并将选中的内容拖动到EditText输入框中，如果这时候的长度超过了EditText的输入长度限制，程序会直接崩溃掉，在高版本的Android SDK中这个问题已经改了，如果出现上面的情况会直接清空输入框中的内容，为了避免这种讨厌的问题，我们可以屏蔽EditText的复制和粘贴功能，只需要屏蔽EditText的长按响应即可：</p>
+<pre><code>/**
+ * 屏蔽复制、粘贴功能
+ *
+ * */
+mInputEditTxt.setCustomSelectionActionModeCallback(newActionMode.Callback()&#123;
+    publicbooleanonCreateActionMode(ActionMode actionMode,Menu menu)&#123;
+        returnfalse;
+    &#125;
+
+    publicbooleanonPrepareActionMode(ActionMode actionMode,Menu menu)&#123;
+        returnfalse;
+    &#125;
+
+    publicbooleanonActionItemClicked(ActionMode actionMode,MenuItem menuItem)&#123;
+        returnfalse;
+    &#125;
+
+    @Override
+    publicvoidonDestroyActionMode(ActionMode mode)&#123;
+
+    &#125;
+&#125;);
+
+mInputEditTxt.setLongClickable(false);
+</code></pre>
+<blockquote>
+<p>来源： 张明云（@UperOne）</p>
+<p>链接： <a target="_blank" rel="noopener" href="http://www.jianshu.com/p/1f05bb1fde3e">http://www.jianshu.com/p/1f05bb1fde3e</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2016/08/09/Android-EditText-YouShouldKnow/" title="EditText的使用及值得注意的地方">http://ocnyang.com/2016/08/09/Android-EditText-YouShouldKnow/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android%E6%8E%A7%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> Android控件</a>
+              <a href="/tags/EditText/" rel="tag"><i class="fa fa-tag"></i> EditText</a>
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/09/AndroidStudy1/" rel="prev" title="Android教学大纲">
+      <i class="fa fa-chevron-left"></i> Android教学大纲
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/09/OkHttpUseGuide/" rel="next" title="OkHttp使用教程">
+      OkHttp使用教程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E9%BB%98%E8%AE%A4%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">设置默认输入法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E5%92%8C%E5%85%B3%E9%97%AD%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">打开和关闭输入法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E5%90%ACEditText%E7%9A%84%E8%BE%93%E5%85%A5%E7%8A%B6%E6%80%81"><span class="nav-number">3.</span> <span class="nav-text">监听EditText的输入状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E5%90%AC%E8%BE%93%E5%85%A5%E6%B3%95%E4%B8%AD%E7%9A%84%E5%9B%9E%E8%BD%A6%E6%8C%89%E9%92%AE"><span class="nav-number">4.</span> <span class="nav-text">监听输入法中的回车按钮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E5%8F%98%E8%BE%93%E5%85%A5%E6%B3%95%E4%B8%AD%E5%9B%9E%E8%BD%A6%E6%8C%89%E9%92%AE%E7%9A%84%E6%98%BE%E7%A4%BA%E5%86%85%E5%AE%B9"><span class="nav-number">5.</span> <span class="nav-text">改变输入法中回车按钮的显示内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E8%BE%93%E5%85%A5%E5%86%85%E5%AE%B9"><span class="nav-number">6.</span> <span class="nav-text">限制输入内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%8F%E8%94%BDEditText%E7%9A%84%E5%A4%8D%E5%88%B6%E3%80%81%E7%B2%98%E8%B4%B4%E5%8A%9F%E8%83%BD"><span class="nav-number">7.</span> <span class="nav-text">屏蔽EditText的复制、粘贴功能</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : 'e932b5a760aab29669638371e6e97f94',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

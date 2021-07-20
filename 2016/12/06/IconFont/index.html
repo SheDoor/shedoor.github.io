@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="今天我们来介绍一种用TextView代替并显示图片，以达到App优化及图标自适应的效果。当然，我们先来看一下效果：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 图标自适应：用 TextView 来显示图片 &amp; 生成自己的字体库">
+<meta property="og:url" content="http://ocnyang.com/2016/12/06/IconFont/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="今天我们来介绍一种用TextView代替并显示图片，以达到App优化及图标自适应的效果。当然，我们先来看一下效果：">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont_.png">
+<meta property="og:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont.png">
+<meta property="og:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont_all.png">
+<meta property="og:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont_setect.png">
+<meta property="og:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont_cart.png">
+<meta property="og:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont_ttf.png">
+<meta property="article:published_time" content="2016-12-06T16:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.783Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Android教程系列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/ocnyang/iconfont/iconfont_.png">
+
+<link rel="canonical" href="http://ocnyang.com/2016/12/06/IconFont/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Android 图标自适应：用 TextView 来显示图片 & 生成自己的字体库 | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2016/12/06/IconFont/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android 图标自适应：用 TextView 来显示图片 & 生成自己的字体库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-12-06 16:03:15" itemprop="dateCreated datePublished" datetime="2016-12-06T16:03:15+00:00">2016-12-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">Android教程系列</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>今天我们来介绍一种用TextView代替并显示图片，以达到App优化及图标自适应的效果。当然，我们先来看一下效果：  </p>
+<p><img src="http://img.shedoor.net/ocnyang/iconfont/iconfont_.png" alt="这些真的只是TextView文本">  </p>
+<span id="more"></span>
+
+<blockquote>
+<p>如果你看到上面这张图片，第一反映你可能认为都是用ImageView去显示的，那你就错了，这些全都是用TextView实现的（当然更不可能是给 TextView 设置了背景图）。  </p>
+</blockquote>
+<p>平时我们在开发中，图片可谓是处处可见且必不可少的一部分，为了想尽办法让图片达到适配的效果我们可能需要：<br>根据不同分辨率来提供多套图，暂且不说这种方式是否麻烦，正常情况下我们切的三套或更多套图有时候总在有些机型上的效果不尽人意。<br>可能这时候你想到了用 <code>.9图片</code>，这时候且不说你们家 UI 妹子会不会单独的为我们 Android 端提供  <code>.9图片</code> （姑且相信你们家UI会制作<code>.9</code>），但是 <code>.9图片</code> 是有一定的局限性的，它只能是图片部分区域拉伸。  </p>
+<p><a href="http://ocnyang.com/">这篇文章</a>也并不是去介绍如何去做图片的适配，而是介绍一种利用字体库的方式，我们用 TextView 的形式去显示图片，而且我们还可以正常的使用 <code>android:textSize</code> 属性来随意设置图片的大小！   </p>
+<blockquote>
+<p>其实这里通过 TextView 来显示图片的方式，我更愿意更准确的说成是通过 <strong>TextView 来显示图标</strong>，因为这里的图片不是真正意义上的大图而是相当于可以随意拉伸的矢量图。当然，如果你愿意你也可以用这种方式来显示图片。  </p>
+</blockquote>
+<p>啰嗦这么多，你的大刀是不是早就饥渴难耐了？其实这种方式很容易就能实现，只是通过给 TextView 设置一种字体，不要着急，马上开始。  </p>
+<h2 id="为TextView设置字体"><a href="#为TextView设置字体" class="headerlink" title="为TextView设置字体"></a>为TextView设置字体</h2><p>大家都知道，在 android 中，我们如果要更换字体，除了要引入我们需要的字体库外，还需要给我们的 TextView 去手动设置使用的字体，如何去设置呢？其实很简单。</p>
+<pre><code>textView.setTypeface(Typeface tf);  
+</code></pre>
+<p>尽管就这么一行代码，但是，在我们项目中肯定会存在大量的TextView，难道我们要一个个的去动手设置吗？想想这也是一件很头疼的事，下面就介绍一种方便的方法，一行代码解决字体设置的问题。  </p>
+<p><strong>方法一：工具类 &amp; 递归遍历</strong>  </p>
+<blockquote>
+<p>在看代码之前，先来看看思路，其实思路很简单，我们提供一个根布局，写一个方法去递归遍历整个根布局，如果发现是textView，则设置字体。思路很简单，相信代码也很简单，就是一个递归方法。  </p>
+</blockquote>
+<pre><code>public class FontHelper &#123;
+    public static final String DEF_FONT = &quot;fonts/ocnyangfont.ttf&quot;;
+
+    public static final void injectFont(View rootView) &#123;
+        injectFont(rootView, Typeface.createFromAsset(rootView.getContext().getAssets(),
+                DEF_FONT));
+    &#125;
+
+    private static void injectFont(View rootView, Typeface typeface) &#123;
+        if (rootView instanceof ViewGroup) &#123;
+            ViewGroup viewGroup = (ViewGroup) rootView;
+            int childViewCount = viewGroup.getChildCount();
+            for (int i = 0; i &lt; childViewCount; i++) &#123;
+                injectFont(viewGroup.getChildAt(i), typeface);
+            &#125;
+        &#125; else if (rootView instanceof TextView) &#123;
+            ((TextView) rootView).setTypeface(typeface);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>定义了一个工具类，这个类提供两个静态方法，但是核心都是  </p>
+<pre><code>public static final void injectFont(View rootView, Typeface tf)
+</code></pre>
+<blockquote>
+<p>这个方法中，首先我们去判断我们给的rootView是不是ViewGroup，如果是ViewGroup，则遍历他的所有子view，然后递归去调用这个方法，直到全部完成，如果发现某个view是TextView，则我们调用setTypeface方法来设置字体。<br>ok，从这个工具类中我们还可以看到，我们的字体是放在assets/fonts目录下的。</p>
+</blockquote>
+<p>最后是在activity中使用字体库，正式利用了上面的工具类，所以我们的代码将会很简单。  </p>
+<pre><code>@Override
+protected void onCreate(Bundle savedInstanceState) &#123;
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    FontHelper.injectFont(findViewById(android.R.id.content));
+&#125;
+</code></pre>
+<p>仅仅一行代码，<code>FontHelper.injectFont(findViewById(android.R.id.content));</code><br>我们就完成了给所有TextView设置字体的工作。</p>
+<p><strong>方法二：LayoutInflate</strong>  </p>
+<p>现在对 LayoutInflateFactory 的用法还不太熟悉的，可以先去看一下鸿洋的这篇博文：<a target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/51503977">探究 LayoutInflate setFactory</a>。  </p>
+<p>我们编写一个自定义的LayoutInflaterFactory：  </p>
+<pre><code>public class IconFontLayoutFactory implements LayoutInflaterFactory &#123;
+
+    private static Typeface sTypeface;
+    private AppCompatDelegate mAppCompatDelegate;
+
+    public IconFontLayoutFactory(Context context,
+                                 AppCompatDelegate appCompatDelegate) &#123;
+        if (sTypeface == null) &#123;
+            sTypeface = Typeface.createFromAsset(context.getAssets(),
+                    &quot;fonts/ocnyangfont.ttf&quot;);
+        &#125;
+        mAppCompatDelegate = appCompatDelegate;
+    &#125;
+
+    @Override
+    public View onCreateView(View parent, String name, Context context,
+                             AttributeSet attrs) &#123;
+        View view = mAppCompatDelegate.createView(parent, name, context, attrs);
+        if (view instanceof TextView) &#123;
+            ((TextView) view).setTypeface(sTypeface);
+        &#125;
+        return view;
+    &#125;
+&#125;
+</code></pre>
+<p>字体文件我们还是放在 <code>assets/fonts</code> 目录下。  </p>
+<p>然后你可以在你的BaseActivity的onCreate中，调用如下代码：  </p>
+<pre><code>@Override
+protected void onCreate(Bundle savedInstanceState) &#123;
+
+        LayoutInflaterCompat.setFactory(getLayoutInflater(),
+                new IconFontLayoutFactory(this,getDelegate()));
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+&#125;
+</code></pre>
+<blockquote>
+<p>注意一定要在super.onCreate前调用即可。  </p>
+</blockquote>
+<p>该方式可以在TextView及其子类对象创建完成时，就可以为其调用setTypeFace，非常的高效。<br>而对于字体库的加载，如果有需要，你甚至可以采用懒加载的方式，在SplashActivity中对其初始化。  </p>
+<blockquote>
+<p>这里提供是两种全局设置的方式。<br>有时候我们只是需要给部分 TextView 设置，这时候大家可以选择手动单独给特定的 TextView 设置，也可以通过自定义 View 的方案来实现（<strong>在构造方法中去设置 TypeFace</strong>，我个人也比较提倡这种方式，使用上相对灵活，也很简单这里就啰嗦了，详细代码可以到这里下载 <a target="_blank" rel="noopener" href="https://github.com/OCNYang/FontTest">本文源码</a> 内查看）。  </p>
+</blockquote>
+<p>那上面这些只是如何设置字体的方法，可能你也早就知道了，字体是字体，也不是图片呀，大兄弟莫慌，下面就给你如何介绍一种酷炫的字体库和制作自己独特的图片字体库的方法。  </p>
+<h2 id="fontawesome-字体库的使用"><a href="#fontawesome-字体库的使用" class="headerlink" title="fontawesome 字体库的使用"></a>fontawesome 字体库的使用</h2><p>在开始使用之前，我们我们需要到<br><strong><a target="_blank" rel="noopener" href="https://github.com/FortAwesome/Font-Awesome/">https://github.com/FortAwesome/Font-Awesome/</a></strong><br>下载这个字体库（不想麻烦，本文 <a target="_blank" rel="noopener" href="https://github.com/OCNYang/FontTest">源代码</a> 也包含有）。下载下来以后，你会看到有很多目录和文件，没关系，我们只需要一个文件-fontawesome-webfont.ttf，这个文件位于/fonts/目录下。将这个ttf文件copy到你项目的assets目录下，按照惯例或者说是共识，我们可能是将它放到assets/fonts这个目录下(注意，没有这个目录的话，创建它！)。  </p>
+<p>ok， 准备工作都做好了，那我们就开始使用它吧，看我的xml布局文件：  </p>
+<pre><code>&lt;LinearLayout
+    //...
+    &gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/text1&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_margin=&quot;10dp&quot;
+        android:textSize=&quot;58sp&quot;
+        android:textColor=&quot;#ff995533&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;&amp;#xe60d;&quot;/&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/text2&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_margin=&quot;10dp&quot;
+        android:textSize=&quot;118sp&quot;
+        android:textColor=&quot;#ff9ff533&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;&amp;#xe615;&quot;/&gt;
+
+    //...
+
+&lt;/LinearLayout&gt;
+</code></pre>
+<p>看到这个布局文件，我们看到和平时没什么区别，给出了textSize或者textColor属性，不用想这些肯定去控制了我们需要显示的图片的大小和颜色！  </p>
+<p>细心的你会发现这些 TextView 文本好奇怪。其实这些文本对应的就是相对于的图片。可是，现在我们又遇到了一个问题，我们怎么知道哪写文本代表了什么图片呢？下面给出一个网址，通过这个网址，大家可以看到实体文本和他对应的图片的一个对照表。  </p>
+<p><a target="_blank" rel="noopener" href="http://fortawesome.github.io/Font-Awesome/cheatsheet/">http://fortawesome.github.io/Font-Awesome/cheatsheet/</a>  </p>
+<blockquote>
+<p>本文 <a target="_blank" rel="noopener" href="https://github.com/OCNYang/FontTest">源码</a> 内我们提供了一个 <code>string.xml</code> 文件的图片字符对照表,可以直接在项目中使用。<br>你也可以在根据自己的需要在上面 <code>string.xml</code> 文件里 <code>Ctrl + F</code> 检索出对应的编码放到自己的字符串文件里或直接使用。   </p>
+</blockquote>
+<p>哦，对了，不知道大家有没有发现，这里我们无意中解决了一个图片大小的问题，因为我们可以任意改变一个文本的大小，所以，就不需要提供多套图去适配不同的屏幕了。  </p>
+<p>这是你可能还是有疑问，<code>Font-Awesome 库</code> 内提供的图标虽然很全很美观，但是不一定能满足我们所有的需要啊！那现在就教大家如何制作属于自己的字体库。  </p>
+<h2 id="制作属于自己的图片字体库"><a href="#制作属于自己的图片字体库" class="headerlink" title="制作属于自己的图片字体库"></a>制作属于自己的图片字体库</h2><p>在自己动手制作图片字体库之前，当然要先查找一些自己喜欢的漂亮的图标了，下面开启干货福利模式。  </p>
+<h3 id="图标干货"><a href="#图标干货" class="headerlink" title="图标干货"></a>图标干货</h3><p>对于使用，最主要就是找到一些靠谱的素材站点了</p>
+<p><a target="_blank" rel="noopener" href="http://www.iconfont.cn/">http://www.iconfont.cn/</a><br><a target="_blank" rel="noopener" href="https://icomoon.io/app/#/select">https://icomoon.io/app/#/select</a><br><a target="_blank" rel="noopener" href="https://github.com/mikepenz/Android-Iconics">https://github.com/mikepenz/Android-Iconics</a>  </p>
+<p>第一个站点是阿里提供的图标库，基本上可以搜索到需要的任何图标，非常方便，也支持颜色和大小的设置，足够满足我们的需求：</p>
+<p><img src="http://img.shedoor.net/ocnyang/iconfont/iconfont.png" alt="阿里 iconfont 图标库">  </p>
+<h3 id="自定义图标"><a href="#自定义图标" class="headerlink" title="自定义图标"></a>自定义图标</h3><p>无论上面这些网站提供的图标是多么的全，可能都无法满足贪心的你或者你们家追求完美（矫情）到极致的UI，那么如果App内的图标部分是自己制作的，再混杂着网络上已有的图标能打包到一个字体库么？<br>答案当然是肯定的，我们本来就是要制作属于自己的字体库嘛！比如你就可以依赖 <code>iconfont.com</code> 这个网站，自行上传svg图标，然后就可以自由选择了。  </p>
+<blockquote>
+<p>关于 iconfont 网站的用法可以参考官方手册(也可以跳过，直接跟着我学习怎么生成自己的字体库)：<br><a target="_blank" rel="noopener" href="http://www.iconfont.cn/help/platform.html">http://www.iconfont.cn/help/platform.html</a>  </p>
+</blockquote>
+<h3 id="按需生成自己的图标字体库"><a href="#按需生成自己的图标字体库" class="headerlink" title="按需生成自己的图标字体库"></a>按需生成自己的图标字体库</h3><p>我们以 iconfont 库为例，教大家<a href="http://ocnyang.com/">生成自己图片字体库的整个流程</a>（下面所有步骤，大家都无需注册账号，就可以直接使用）。  </p>
+<p>首先在 iconfont 网站上选择自己要生成到字体库的图标，可以选择网站字体库中选择，也可以在我的图标库中选择自己上传的图标。把这些图标添加到库（即添加到购物车）：  </p>
+<p><img src="http://img.shedoor.net/ocnyang/iconfont/iconfont_all.png" alt="选择喜欢的图标">  </p>
+<p><img src="http://img.shedoor.net/ocnyang/iconfont/iconfont_setect.png" alt="添加到购物车">  </p>
+<p>当你想要生成的字体库的图标选择完成后，在网站右上角点击打开库（购物车），在库里可以看到自己选择的所有图标，确定后点击下载代码：  </p>
+<p><img src="http://img.shedoor.net/ocnyang/iconfont/iconfont_cart.png" alt="打开库，下载代码会得到一个压缩包">  </p>
+<p><img src="http://img.shedoor.net/ocnyang/iconfont/iconfont_ttf.png" alt="解压缩后，可以看到生成的库">  </p>
+<p>在解压后的文件夹中，我们看到许多文件。其中以 <code>.ttf</code> 结尾的文件就是我们生成的自己的字体库，而 3 个 <code>.html</code> 文件对应的是不同平台使用时对应的编码。而我们在 Android 开发中要使用的编码是 <code>demo_unicode.html</code> 文件里对应的 <code>&amp;#xxxxx;</code> 形式的编码。  </p>
+<p>细心的你一定会发现，生成的字体库里虽然包含了很多图标，却只有小小的几 KB 的大小，更难能可贵的是无论设置多大的尺寸它依旧能够保存一样的清晰度，当然，你也可以把该方案看成apk瘦身的可选手段之一。</p>
+<p>本文Demo源代码下载地址：**<a target="_blank" rel="noopener" href="https://github.com/OCNYang/FontTest">https://github.com/OCNYang/FontTest</a>**  </p>
+<blockquote>
+<p>参考：<br><a target="_blank" rel="noopener" href="http://blog.csdn.net/qibin0506/article/details/48675839">亓斌 - FontAwesome-用TextView显示图片</a><br><a target="_blank" rel="noopener" href="http://chuansong.me/n/797491851925">鸿洋 - Android IconFont全攻略</a><br><a target="_blank" rel="noopener" href="https://code.tutsplus.com/tutorials/how-to-use-fontawesome-in-an-android-app--cms-24167">How to Use FontAwesome in an Android App</a>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2016/12/06/IconFont/" title="Android 图标自适应：用 TextView 来显示图片 &amp; 生成自己的字体库">http://ocnyang.com/2016/12/06/IconFont/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              <a href="/tags/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" rel="tag"><i class="fa fa-tag"></i> Android教程系列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/11/24/INWaitRainStopWithoutU/" rel="prev" title="我不等伞，也不等雨停">
+      <i class="fa fa-chevron-left"></i> 我不等伞，也不等雨停
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/12/06/TheMeaningOfMarriage/" rel="next" title="结婚的意义">
+      结婚的意义 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BATextView%E8%AE%BE%E7%BD%AE%E5%AD%97%E4%BD%93"><span class="nav-number">1.</span> <span class="nav-text">为TextView设置字体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fontawesome-%E5%AD%97%E4%BD%93%E5%BA%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">fontawesome 字体库的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%B6%E4%BD%9C%E5%B1%9E%E4%BA%8E%E8%87%AA%E5%B7%B1%E7%9A%84%E5%9B%BE%E7%89%87%E5%AD%97%E4%BD%93%E5%BA%93"><span class="nav-number">3.</span> <span class="nav-text">制作属于自己的图片字体库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%A0%87%E5%B9%B2%E8%B4%A7"><span class="nav-number">3.1.</span> <span class="nav-text">图标干货</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9B%BE%E6%A0%87"><span class="nav-number">3.2.</span> <span class="nav-text">自定义图标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E9%9C%80%E7%94%9F%E6%88%90%E8%87%AA%E5%B7%B1%E7%9A%84%E5%9B%BE%E6%A0%87%E5%AD%97%E4%BD%93%E5%BA%93"><span class="nav-number">3.3.</span> <span class="nav-text">按需生成自己的图标字体库</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : 'e1712def1057674b885eb09ac734c3a9',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

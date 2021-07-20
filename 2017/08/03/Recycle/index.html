@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这次主要是把 RecyclerView 比较常用的基本的点，在这里集中整理一下。从这篇文章主要梳理以下几点：    优雅的实现：item 点击事件 &amp; item 长点击事件 RecyclerView 添加 divider 的标准姿势 RecyclerView 实k现 item 的拖曳排序和滑动删除 拖曳排序时，限制首个 item 固定的实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RecyclerView 梳理：点击&amp;长按事件、分割线、拖曳排序、滑动删除">
+<meta property="og:url" content="http://ocnyang.com/2017/08/03/Recycle/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="这次主要是把 RecyclerView 比较常用的基本的点，在这里集中整理一下。从这篇文章主要梳理以下几点：    优雅的实现：item 点击事件 &amp; item 长点击事件 RecyclerView 添加 divider 的标准姿势 RecyclerView 实k现 item 的拖曳排序和滑动删除 拖曳排序时，限制首个 item 固定的实现">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/github/recyclerviewevent/recy_swipanddrag.gif?imageView2/2/w/300">
+<meta property="og:image" content="http://img.shedoor.net/github/recyclerviewevent/recy_drag.gif?imageView2/2/w/300">
+<meta property="og:image" content="http://img.shedoor.net/github/recyclerviewevent/onlydrag.gif?imageView2/2/w/300">
+<meta property="og:image" content="http://img.shedoor.net/github/recyclerviewevent/recy_drag.gif?imageView2/2/w/300">
+<meta property="og:image" content="http://img.shedoor.net/github/recyclerviewevent/firstguding.gif?imageView2/2/w/300">
+<meta property="article:published_time" content="2017-08-03T11:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.783Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="RecyclerView">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/github/recyclerviewevent/recy_swipanddrag.gif?imageView2/2/w/300">
+
+<link rel="canonical" href="http://ocnyang.com/2017/08/03/Recycle/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>RecyclerView 梳理：点击&长按事件、分割线、拖曳排序、滑动删除 | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2017/08/03/Recycle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RecyclerView 梳理：点击&长按事件、分割线、拖曳排序、滑动删除
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-08-03 11:03:15" itemprop="dateCreated datePublished" datetime="2017-08-03T11:03:15+00:00">2017-08-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android%E6%8E%A7%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">Android控件</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>16k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>15 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这次主要是把 RecyclerView 比较常用的基本的点，在这里集中整理一下。从这篇文章主要梳理以下几点：  </p>
+<ul>
+<li>优雅的实现：item 点击事件 &amp; item 长点击事件</li>
+<li>RecyclerView 添加 divider 的标准姿势</li>
+<li>RecyclerView 实k现 item 的拖曳排序和滑动删除</li>
+<li>拖曳排序时，限制首个 item 固定的实现</li>
+</ul>
+<span id="more"></span>
+
+<p>先看一下最终的效果图：  </p>
+<p><img src="http://img.shedoor.net/github/recyclerviewevent/recy_swipanddrag.gif?imageView2/2/w/300" alt="swipe and drag"> <img src="http://img.shedoor.net/github/recyclerviewevent/recy_drag.gif?imageView2/2/w/300" alt="drag">  </p>
+<p>自从 RecyclerView 发布以来，由于其高度的可交互性被广泛使用。相信大家肯定对它的使用方法已经非常熟练了，今天主要是为大家总结一下较正常用法更加优雅的方式。  </p>
+<blockquote>
+<p>如果你想再回顾一下 RecyclerView 的基本使用方法，推荐鸿洋的这篇文章：<br><a target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/45059587">Android RecyclerView 使用完全解析 体验艺术般的控件</a>  </p>
+</blockquote>
+<h2 id="优雅的实现：item-点击事件-amp-item-长点击事件"><a href="#优雅的实现：item-点击事件-amp-item-长点击事件" class="headerlink" title="优雅的实现：item 点击事件 &amp; item 长点击事件"></a>优雅的实现：item 点击事件 &amp; item 长点击事件</h2><h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>RecyclerView 的 api 虽然没有提供 onItemClickListener 但是提供了 addOnItemTouchListener() 方法，既然可以添加触摸监听，那么我们完全可以获取触摸手势来识别点击事件，然后通过触摸坐标来判断点击的是哪一个item。  </p>
+<pre><code>mRecyclerView.addOnItemTouchListener(new OnRecyclerItemClickListener(mRecyclerView) &#123;
+            @Override
+            public void onItemClick(RecyclerView.ViewHolder viewHolder) &#123;
+                //TODO item 点击事件
+            &#125;
+
+            @Override
+            public void onLongClick(RecyclerView.ViewHolder viewHolder) &#123;
+                //TODO item 长按事件
+            &#125;
+        &#125;);
+</code></pre>
+<p>其中 OnRecyclerItemClickListener 是自定义的一个触摸监听器，代码如下：  </p>
+<pre><code>public abstract class OnRecyclerItemClickListener implements RecyclerView.OnItemTouchListener&#123;
+    private GestureDetectorCompat mGestureDetectorCompat;//手势探测器
+    private RecyclerView mRecyclerView;
+
+    public OnRecyclerItemClickListener(RecyclerView recyclerView) &#123;
+        mRecyclerView = recyclerView;
+        mGestureDetectorCompat = new GestureDetectorCompat(mRecyclerView.getContext(),
+                new ItemTouchHelperGestureListener());
+    &#125;
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) &#123;
+        mGestureDetectorCompat.onTouchEvent(e);
+        return false;
+    &#125;
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) &#123;
+        mGestureDetectorCompat.onTouchEvent(e);
+    &#125;
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) &#123;
+    &#125;
+
+    public abstract void onItemClick(RecyclerView.ViewHolder viewHolder);
+    public abstract void onLongClick(RecyclerView.ViewHolder viewHolder);
+&#125;
+</code></pre>
+<p>GestureDetectorCompat 中传入了一个 ItemTouchHelperGestureListener，代码如下：  </p>
+<pre><code>private class ItemTouchHelperGestureListener extends GestureDetector.SimpleOnGestureListener&#123;
+            //一次单独的轻触抬起手指操作，就是普通的点击事件
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) &#123;
+                View childViewUnder = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                if (childViewUnder != null) &#123;
+                    RecyclerView.ViewHolder childViewHolder = mRecyclerView.getChildViewHolder(childViewUnder);
+                    onItemClick(childViewHolder);
+                &#125;
+                return true;
+            &#125;
+
+            //长按屏幕超过一定时长，就会触发，就是长按事件
+            @Override
+            public void onLongPress(MotionEvent e) &#123;
+                View childViewUnder = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                if (childViewUnder != null) &#123;
+                    RecyclerView.ViewHolder childViewHolder = mRecyclerView.getChildViewHolder(childViewUnder);
+                    onLongClick(childViewHolder);
+                &#125;
+            &#125;
+        &#125;
+</code></pre>
+<h3 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h3><p>上面的代码很简单没什么复杂的地方，就是通过一个手势探测器 GestureDetectorCompat 来探测屏幕事件，然后通过手势监听器 SimpleOnGestureListener 来识别手势事件的种类，然后调用我们设置的对应的回调方法。这里值得说的是：当获取到了 RecyclerView 的点击事件和触摸事件数据 MotionEvent，那么如何才能知道点击的是哪一个 item 呢？  </p>
+<p>RecyclerView已经为我们提供了这样的方法：<code>findChildViewUnder()</code>。</p>
+<p>我们可以通过这个方法获得点击的 item ，同时我们调用 RecyclerView 的另一个方法 <code>getChildViewHolder()</code>，可以获得该 item 的 ViewHolder，最后再回调我们定义的虚方法 onItemClick() 就ok了，这样我们就可以在外部实现该方法来获得 item 的点击事件了。  </p>
+<h2 id="RecyclerView-添加-divider-的标准姿势"><a href="#RecyclerView-添加-divider-的标准姿势" class="headerlink" title="RecyclerView 添加 divider 的标准姿势"></a>RecyclerView 添加 divider 的标准姿势</h2><p>当你想给条目间添加 divider 时，你可能自然而然的去尝试这种方式：  </p>
+<pre><code>&lt;android.support.v7.widget.RecyclerView
+    android:divider=&quot;#ffff0000&quot;
+    android:dividerHeight=&quot;10dp&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot; /&gt;
+</code></pre>
+<p>其实 RecyclerView 是没有这两个属性的，就算你写上也不会有任何效果。<br>当然你还可以通过给 item 的最外层布局设置一个 margin 值，甚至你还可以专门在 item 布局中的适当地方添加一个高度/宽度为 1 的带背景的 View 作为 divider，这两种方法呢，确实有效果，但是不够优雅，有时还可能带来一些想不到的问题。  </p>
+<p>其实官方还是为我们提供了为 RecyclerView 添加分割线的方式的，那就是方法： <code>mRecyclerView.addItemDecoration()</code> 。该方法的参数为 RecyclerView.ItemDecoration，该类为抽象类，且官方目前并没有提供默认的实现类，我们只能自己来实现。</p>
+<h3 id="使用方式-1"><a href="#使用方式-1" class="headerlink" title="使用方式"></a>使用方式</h3><p><strong>列表布局的分割线实例：</strong>  </p>
+<pre><code>public class DividerListItemDecoration extends RecyclerView.ItemDecoration &#123;
+    private static final int[] ATTRS = new int[]&#123;
+            android.R.attr.listDivider
+    &#125;;
+
+    public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
+
+    public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
+
+    private Drawable mDivider;
+
+    private int mOrientation;
+
+    public DividerListItemDecoration(Context context, int orientation) &#123;
+        final TypedArray a = context.obtainStyledAttributes(ATTRS);
+        mDivider = a.getDrawable(0);
+        a.recycle();
+        setOrientation(orientation);
+    &#125;
+
+    public DividerListItemDecoration(Context context, int orientation, int drawableId) &#123;
+        mDivider = ContextCompat.getDrawable(context, drawableId);
+        setOrientation(orientation);
+    &#125;
+
+    public void setOrientation(int orientation) &#123;
+        if (orientation != HORIZONTAL_LIST &amp;&amp; orientation != VERTICAL_LIST) &#123;
+            throw new IllegalArgumentException(&quot;invalid orientation&quot;);
+        &#125;
+        mOrientation = orientation;
+    &#125;
+
+    //画线 &gt; 就是画出你想要的分割线样式
+    @Override
+    public void onDraw(Canvas c, RecyclerView parent) &#123;
+        if (mOrientation == VERTICAL_LIST) &#123;
+            drawVertical(c, parent);
+        &#125; else &#123;
+            drawHorizontal(c, parent);
+        &#125;
+
+    &#125;
+
+
+    public void drawVertical(Canvas c, RecyclerView parent) &#123;
+        final int left = parent.getPaddingLeft();
+        final int right = parent.getWidth() - parent.getPaddingRight();
+
+        final int childCount = parent.getChildCount();
+        for (int i = 0; i &lt; childCount; i++) &#123;
+            final View child = parent.getChildAt(i);
+            android.support.v7.widget.RecyclerView v = new android.support.v7.widget.RecyclerView(parent.getContext());
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
+                    .getLayoutParams();
+            final int top = child.getBottom() + params.bottomMargin;
+            final int bottom = top + mDivider.getIntrinsicHeight();
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        &#125;
+    &#125;
+
+    public void drawHorizontal(Canvas c, RecyclerView parent) &#123;
+        final int top = parent.getPaddingTop();
+        final int bottom = parent.getHeight() - parent.getPaddingBottom();
+
+        final int childCount = parent.getChildCount();
+        for (int i = 0; i &lt; childCount; i++) &#123;
+            final View child = parent.getChildAt(i);
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
+                    .getLayoutParams();
+            final int left = child.getRight() + params.rightMargin;
+            final int right = left + mDivider.getIntrinsicHeight();
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        &#125;
+    &#125;
+
+    //设置条目周边的偏移量
+    @Override
+    public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) &#123;
+        if (mOrientation == VERTICAL_LIST) &#123;
+            outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+        &#125; else &#123;
+            outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p><strong>网格布局分割线实例：</strong>  </p>
+<pre><code>public class DividerGridItemDecoration extends RecyclerView.ItemDecoration &#123;
+
+    private static final int[] ATTRS = new int[]&#123;android.R.attr.listDivider&#125;;
+    private Drawable mDivider;
+    private int lineWidth = 1;
+
+    public DividerGridItemDecoration(Context context) &#123;
+        final TypedArray a = context.obtainStyledAttributes(ATTRS);
+        mDivider = a.getDrawable(0);
+        a.recycle();
+    &#125;
+
+    public DividerGridItemDecoration(int color) &#123;
+        mDivider = new ColorDrawable(color);
+    &#125;
+
+    public DividerGridItemDecoration() &#123;
+        this(Color.parseColor(&quot;#cccccc&quot;));
+    &#125;
+
+    @Override
+    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) &#123;
+        drawHorizontal(c, parent);
+        drawVertical(c, parent);
+    &#125;
+
+    private int getSpanCount(RecyclerView parent) &#123;
+        // 列数
+        int spanCount = -1;
+        RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+        if (layoutManager instanceof GridLayoutManager) &#123;
+
+            spanCount = ((GridLayoutManager) layoutManager).getSpanCount();
+        &#125; else if (layoutManager instanceof StaggeredGridLayoutManager) &#123;
+            spanCount = ((StaggeredGridLayoutManager) layoutManager)
+                    .getSpanCount();
+        &#125;
+        return spanCount;
+    &#125;
+
+    public void drawHorizontal(Canvas c, RecyclerView parent) &#123;
+        int childCount = parent.getChildCount();
+        for (int i = 0; i &lt; childCount; i++) &#123;
+            final View child = parent.getChildAt(i);
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
+                    .getLayoutParams();
+            final int left = child.getLeft() - params.leftMargin;
+            final int right = child.getRight() + params.rightMargin
+                    + lineWidth;
+            final int top = child.getBottom() + params.bottomMargin;
+            final int bottom = top + lineWidth;
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        &#125;
+    &#125;
+
+    public void drawVertical(Canvas c, RecyclerView parent) &#123;
+        final int childCount = parent.getChildCount();
+        for (int i = 0; i &lt; childCount; i++) &#123;
+            final View child = parent.getChildAt(i);
+
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+            final int top = child.getTop() - params.topMargin;
+            final int bottom = child.getBottom() + params.bottomMargin;
+            final int left = child.getRight() + params.rightMargin;
+            final int right = left + lineWidth;
+
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        &#125;
+    &#125;
+
+    private boolean isLastColum(RecyclerView parent, int pos, int spanCount, int childCount) &#123;
+        RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+        if (layoutManager instanceof GridLayoutManager) &#123;
+            if ((pos + 1) % spanCount == 0)// 如果是最后一列，则不需要绘制右边
+            &#123;
+                return true;
+            &#125;
+        &#125; else if (layoutManager instanceof StaggeredGridLayoutManager) &#123;
+            int orientation = ((StaggeredGridLayoutManager) layoutManager)
+                    .getOrientation();
+            if (orientation == StaggeredGridLayoutManager.VERTICAL) &#123;
+                if ((pos + 1) % spanCount == 0)// 如果是最后一列，则不需要绘制右边
+                &#123;
+                    return true;
+                &#125;
+            &#125; else &#123;
+                childCount = childCount - childCount % spanCount;
+                if (pos &gt;= childCount)// 如果是最后一列，则不需要绘制右边
+                    return true;
+            &#125;
+        &#125;
+        return false;
+    &#125;
+
+    private boolean isLastRaw(RecyclerView parent, int pos, int spanCount, int childCount) &#123;
+        LayoutManager layoutManager = parent.getLayoutManager();
+        if (layoutManager instanceof GridLayoutManager) &#123;
+            childCount = childCount - childCount % spanCount;
+            if (pos &gt;= childCount)// 如果是最后一行，则不需要绘制底部
+                return true;
+        &#125; else if (layoutManager instanceof StaggeredGridLayoutManager) &#123;
+            int orientation = ((StaggeredGridLayoutManager) layoutManager)
+                    .getOrientation();
+            // StaggeredGridLayoutManager 且纵向滚动
+            if (orientation == StaggeredGridLayoutManager.VERTICAL) &#123;
+                childCount = childCount - childCount % spanCount;
+                // 如果是最后一行，则不需要绘制底部
+                if (pos &gt;= childCount)
+                    return true;
+            &#125; else
+            // StaggeredGridLayoutManager 且横向滚动
+            &#123;
+                // 如果是最后一行，则不需要绘制底部
+                if ((pos + 1) % spanCount == 0) &#123;
+                    return true;
+                &#125;
+            &#125;
+        &#125;
+        return false;
+    &#125;
+
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) &#123;
+        boolean b = state.willRunPredictiveAnimations();
+        int itemPosition = ((RecyclerView.LayoutParams) view.getLayoutParams()).getViewLayoutPosition();
+        int spanCount = getSpanCount(parent);
+        int childCount = parent.getAdapter().getItemCount();
+//        if (isLastRaw(parent, itemPosition, spanCount, childCount))// 如果是最后一行，则不需要绘制底部
+//        &#123;
+//            outRect.set(0, 0, lineWidth, 0);
+//        &#125;
+//        else if (isLastColum(parent, itemPosition, spanCount, childCount))// 如果是最后一列，则不需要绘制右边
+//        &#123;
+////            if (b)&#123;
+////                outRect.set(0, 0, lineWidth, lineWidth);
+////            &#125;else &#123;
+//                outRect.set(0, 0, 0, lineWidth);
+////            &#125;
+//        &#125;
+//        else &#123;
+        outRect.set(0, 0, lineWidth, lineWidth);
+//        &#125;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h3><p>上面给出的两个实例都是最简单的一条线的分割。这里的分割线你是可以自由的去自定义它的，具体如何实现也不是太复杂，这里不再做详细介绍了，推荐一篇文章：  </p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://www.10tiao.com/html/227/201705/2650239745/1.html">RecyclerView之ItemDecoration 讲解及高级特性实践</a>  </p>
+</blockquote>
+<h2 id="RecyclerView-实现-item-的拖曳排序和滑动删除"><a href="#RecyclerView-实现-item-的拖曳排序和滑动删除" class="headerlink" title="RecyclerView 实现 item 的拖曳排序和滑动删除"></a>RecyclerView 实现 item 的拖曳排序和滑动删除</h2><p>下面就主要为大家梳理一下拖曳排序和滑动删除的实现，具体实现效果看文章首部效果图，这里就不再重复放图了。  </p>
+<h3 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h3><p>主要就要使用到 ItemTouchHelper，ItemTouchHelper 一个帮助开发人员处理拖拽和滑动删除的实现类，它能够让你非常容易实现侧滑删除、拖拽的功能。（ItemTouchHelper 的使用并不仅仅局限于 RecyclerView 的滑动删除，你同意可以用在其他需要拖曳滑动的地方。当然，今天我们不涉及其他地方的使用）  </p>
+<p>实现的代码并关联到 RecyclerView 非常简单，代码如下：  </p>
+<pre><code>ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback());
+itemTouchHelper.attachToRecyclerView(mRecyclerView);
+</code></pre>
+<p>代码很简单，没什么好说的。需要我们关注的是创建 ItemTouchHelper 时传入的参数  ItemTouchHelper.Callback() 。ItemTouchHelper 会在拖拽的时候回调 Callback 中相应的方法，我们只需在 Callback 中实现自己的逻辑。</p>
+<p>自定义一个类继承实现 ItemTouchHelper.Callback 接口，需要实现以下方法：  </p>
+<pre><code>//通过返回值来设置是否处理某次拖曳或者滑动事件
+public abstract int getMovementFlags(RecyclerView recyclerView,
+                ViewHolder viewHolder);
+
+//当长按并进入拖曳状态时，拖曳的过程中不断的回调此方法
+public abstract boolean onMove(RecyclerView recyclerView,
+                ViewHolder viewHolder, ViewHolder target);
+
+//滑动删除的回调
+public abstract void onSwiped(ViewHolder viewHolder, int direction);
+</code></pre>
+<p>getMovementFlags() 用于设置是否处理拖拽事件和滑动事件，以及拖拽和滑动操作的方向，有以下两种情况：</p>
+<ul>
+<li>如果是列表类型的 RecyclerView，拖拽只有 UP、DOWN 两个方向</li>
+<li>如果是网格类型的则有 UP、DOWN、LEFT、RIGHT 四个方向</li>
+</ul>
+<p>该方法需要编写的代码如下：  </p>
+<pre><code>@Override
+public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) &#123;
+    if (recyclerView.getLayoutManager() instanceof GridLayoutManager) &#123;
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN |
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+        int swipeFlags = 0;
+        return makeMovementFlags(dragFlags, swipeFlags);
+    &#125; else &#123;
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        int swipeFlags = 0;
+        return makeMovementFlags(dragFlags, swipeFlags);
+    &#125;
+&#125;
+</code></pre>
+<blockquote>
+<p>dragFlags 是拖拽标志，<br>swipeFlags 是滑动标志，<br>swipeFlags 都设置为0，暂时不考虑滑动相关操作。</p>
+</blockquote>
+<p>如果设置了相关的 dragFlags，那么当长按 item 的时候就会进入拖拽并在拖拽过程中不断回调 onMove() 方法，我们就在这个方法里获取当前拖拽的 item 和已经被拖拽到所处位置的 item 的ViewHolder，有了这2个 ViewHolder，我们就可以交换他们的数据集并调用 Adapter 的notifyItemMoved 方法来刷新 item。  </p>
+<pre><code>@Override
+public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) &#123;
+    //拖动的 item 的下标
+    int fromPosition = viewHolder.getAdapterPosition();
+    //目标 item 的下标，目标 item 就是当拖曳过程中，不断和拖动的 item 做位置交换的条目。
+    int toPosition = target.getAdapterPosition();
+    if (fromPosition &lt; toPosition) &#123;
+        for (int i = fromPosition; i &lt; toPosition; i++) &#123;
+            Collections.swap(((RecyAdapter) mAdapter).getDataList(), i, i + 1);
+        &#125;
+    &#125; else &#123;
+        for (int i = fromPosition; i &gt; toPosition; i--) &#123;
+            Collections.swap(((RecyAdapter) mAdapter).getDataList(), i, i - 1);
+        &#125;
+    &#125;
+    mAdapter.notifyItemMoved(fromPosition, toPosition);
+    return true;
+&#125;
+</code></pre>
+<p>只要重写完上面这两个方法，RecyclerView 就能实现拖曳的效果了。是不是很简单？但是虽然拖曳是没什么问题了，但是并不能达到下图的效果，因为你正在拖曳的 item 并没有阴影效果。  </p>
+<p><img src="http://img.shedoor.net/github/recyclerviewevent/onlydrag.gif?imageView2/2/w/300" alt="拖曳 item">  </p>
+<p>那怎么才能实现被拖曳的 item 有背景颜色加深起到强调的视觉效果呢？这是需要重写下面两个方法：  </p>
+<pre><code>//当长按 item 刚开始拖曳的时候调用
+@Override
+public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) &#123;
+    if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) &#123;
+        //给被拖曳的 item 设置一个深颜色背景
+        viewHolder.itemView.setBackgroundColor(Color.LTGRAY);
+    &#125;
+    super.onSelectedChanged(viewHolder, actionState);
+&#125;
+
+//当完成拖曳手指松开的时候调用
+@Override
+public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) &#123;
+    super.clearView(recyclerView, viewHolder);
+    //给已经完成拖曳的 item 恢复开始的背景。
+    //这里我们设置的颜色尽量和你 item 在 xml 中设置的颜色保持一致
+    viewHolder.itemView.setBackgroundColor(Color.WHITE);
+&#125;
+</code></pre>
+<p>这样就能完全达到上面图片的效果了。  </p>
+<p><strong>滑动删除</strong>  </p>
+<p>如何实现滑动删除呢？我们只需要实现第三个方法 onSwipe() 就行了。代码如下：  </p>
+<pre><code>@Override
+public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) &#123;
+    int adapterPosition = viewHolder.getAdapterPosition();
+    mAdapter.notifyItemRemoved(adapterPosition);
+    ((RecyAdapter) mAdapter).getDataList().remove(adapterPosition);
+&#125;
+</code></pre>
+<p>同时也不要忘了修改一下 getMovementFlags() 方法，以便能够相应滑动事件：  </p>
+<pre><code>@Override
+public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) &#123;
+    if (recyclerView.getLayoutManager() instanceof GridLayoutManager) &#123;
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN |
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+        int swipeFlags = 0;
+        return makeMovementFlags(dragFlags, swipeFlags);
+    &#125; else &#123;
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        //注意：和拖曳的区别就是在这里
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        return makeMovementFlags(dragFlags, swipeFlags);
+    &#125;
+&#125;
+</code></pre>
+<p>那目前你就能完美的实现拖曳排序和滑动删除了。  </p>
+<p><strong>拖曳排序，首个固定</strong>  </p>
+<p>有时我们希望首个 item 不能被拖曳排序。比如我们在新闻 App 中常见当我们进行新闻分类时，“热门”新闻这个分类总是第一个且不能被拖曳修改，类似下面的效果：  </p>
+<p><img src="http://img.shedoor.net/github/recyclerviewevent/recy_drag.gif?imageView2/2/w/300" alt="首个固定不能被拖曳">  </p>
+<p>那么怎么才能达到上面的效果呢？在上面我们的 Callback 类中有一个方法：  </p>
+<pre><code>public boolean isLongPressDragEnabled() &#123;
+    return true;
+&#125;
+</code></pre>
+<p>这个方法是为了告诉 ItemTouchHelper 是否需要 RecyclerView 支持长按拖拽，默认返回是 ture，理所当然我们要支持，所以我们没有重写，因为默认true。但是这样做是默认全部的item都可以拖拽，怎么实现部分item拖拽呢，在 isLongPressDragEnabled 方法的源码中有提示说，如果想自定义拖曳 view,那么就使用 startDrag(ViewHolder) 方法。  </p>
+<p><strong>第一步：</strong>那么我们就先重写 isLongPressDragEnabled() 方法，返回 false 让它控制所有的 item 都不能拖曳。  </p>
+<pre><code>public boolean isLongPressDragEnabled() &#123;
+    return false;
+&#125;
+</code></pre>
+<p><strong>第二步：</strong>我们给 RecyclerView 设置 item 的长按监听事件，然后判断这个 item 是不是第一个（或者最后一个，如果你不想让最后一个被拖曳的话），如果不是我们就手动调用 startDrag(ViewHolder) 让 item 开始被拖曳。<br>结合上面我们提供的给 item 设置点击和长按事件的方法，我们可以这样：  </p>
+<pre><code>mRecyclerView.addOnItemTouchListener(new OnRecyclerItemClickListener(mRecyclerView) &#123;
+    @Override
+    public void onItemClick(RecyclerView.ViewHolder viewHolder) &#123;
+        //TODO:点击事件
+    &#125;
+
+    @Override
+    public void onLongClick(RecyclerView.ViewHolder viewHolder) &#123;
+        //当 item 被长按且不是第一个时，开始拖曳这个 item
+        if (viewHolder.getLayoutPosition() != 0) &#123;
+            itemTouchHelper.startDrag(viewHolder);
+        &#125;
+    &#125;
+&#125;);
+</code></pre>
+<p><strong>第三步：</strong>如果你以为上面两步你就达到首个 item 固定不被拖曳的话，恭喜你，答对了！首个 item 确实固定不能被拖曳了，可是看看下图，就会令你大跌眼睛：   </p>
+<p><img src="http://img.shedoor.net/github/recyclerviewevent/firstguding.gif?imageView2/2/w/300" alt="首个固定，不能被拖曳，却能被挤动">  </p>
+<p>虽然我们通过上面两步控制了首个 item 不能被长按拖曳，但是我们并没有处理，别的 item 被拖曳到首个 item 的情况。那么如何才能让首个 item 不被挤掉呢，这个也很简单，只需要在 Callback 的 onMove() 方法中处理首个 item 被当着目标 item 的情况就行了。  </p>
+<pre><code>@Override
+public boolean onMove（...) &#123;
+    int fromPosition = viewHolder.getAdapterPosition();
+    int toPosition = target.getAdapterPosition();
+    //其他地方代码都和上面的一样，这个就直接省略了
+    //这里判断如果目标 item 是首个 item，那么就直接返回false，表示不响应此次拖曳移动
+    if (toPosition == 0) &#123;
+        return false;
+    &#125;
+    ...
+    return true;
+&#125;
+</code></pre>
+<p>好了，到这里就大功告成了。  </p>
+<p>本文源代码地址：<a target="_blank" rel="noopener" href="https://github.com/OCNYang/RecyclerViewEvent">https://github.com/OCNYang/RecyclerViewEvent</a>  </p>
+<blockquote>
+<p>参考文章：<br><a target="_blank" rel="noopener" href="http://chuansong.me/n/400690551872">http://chuansong.me/n/400690551872</a><br><a target="_blank" rel="noopener" href="http://chuansong.me/n/400690851058">http://chuansong.me/n/400690851058</a><br><a target="_blank" rel="noopener" href="http://www.10tiao.com/html/227/201705/2650239745/1.html">http://www.10tiao.com/html/227/201705/2650239745/1.html</a>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2017/08/03/Recycle/" title="RecyclerView 梳理：点击&amp;长按事件、分割线、拖曳排序、滑动删除">http://ocnyang.com/2017/08/03/Recycle/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              <a href="/tags/RecyclerView/" rel="tag"><i class="fa fa-tag"></i> RecyclerView</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/09/QBox/" rel="prev" title="小秋魔盒">
+      <i class="fa fa-chevron-left"></i> 小秋魔盒
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/09/01/ContourView/" rel="next" title="自定义 View：用贝塞尔曲线绘制酷炫轮廓背景">
+      自定义 View：用贝塞尔曲线绘制酷炫轮廓背景 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E9%9B%85%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%9Aitem-%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6-amp-item-%E9%95%BF%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">优雅的实现：item 点击事件 &amp; item 长点击事件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">使用方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90"><span class="nav-number">1.2.</span> <span class="nav-text">原理分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RecyclerView-%E6%B7%BB%E5%8A%A0-divider-%E7%9A%84%E6%A0%87%E5%87%86%E5%A7%BF%E5%8A%BF"><span class="nav-number">2.</span> <span class="nav-text">RecyclerView 添加 divider 的标准姿势</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F-1"><span class="nav-number">2.1.</span> <span class="nav-text">使用方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">2.2.</span> <span class="nav-text">使用说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RecyclerView-%E5%AE%9E%E7%8E%B0-item-%E7%9A%84%E6%8B%96%E6%9B%B3%E6%8E%92%E5%BA%8F%E5%92%8C%E6%BB%91%E5%8A%A8%E5%88%A0%E9%99%A4"><span class="nav-number">3.</span> <span class="nav-text">RecyclerView 实现 item 的拖曳排序和滑动删除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">实现方式</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : '6bedcc6c71a9c8e80d1a547d9323ed2a',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>

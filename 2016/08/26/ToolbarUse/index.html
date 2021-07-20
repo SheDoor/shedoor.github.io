@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/ media="defer" onload="this.media='all'">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ocnyang.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="初识 ToolbarToolbar 是在 Android 5.0 开始推出的一个 Material Design 风格的导航控件 ，Google 非常推荐大家使用 Toolbar 来作为Android客户端的导航栏，以此来取代之前的 Actionbar 。与 Actionbar 相比，Toolbar 明显要灵活的多。它不像 Actionbar 一样，一定要固定在Activity的顶部，而是可以放到">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Toolbar开发详解">
+<meta property="og:url" content="http://ocnyang.com/2016/08/26/ToolbarUse/index.html">
+<meta property="og:site_name" content="OCNYang の 博客">
+<meta property="og:description" content="初识 ToolbarToolbar 是在 Android 5.0 开始推出的一个 Material Design 风格的导航控件 ，Google 非常推荐大家使用 Toolbar 来作为Android客户端的导航栏，以此来取代之前的 Actionbar 。与 Actionbar 相比，Toolbar 明显要灵活的多。它不像 Actionbar 一样，一定要固定在Activity的顶部，而是可以放到">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.shedoor.net/toolBar/1.png">
+<meta property="og:image" content="http://img.shedoor.net/toolBar/2.png">
+<meta property="og:image" content="http://img.shedoor.net/toolBar/3.gif">
+<meta property="og:image" content="http://img.shedoor.net/toolBar/4.png">
+<meta property="og:image" content="http://img.shedoor.net/toolBar/5.gif">
+<meta property="og:image" content="http://img.shedoor.net/toolBar/6.gif">
+<meta property="article:published_time" content="2016-08-26T18:03:15.000Z">
+<meta property="article:modified_time" content="2021-07-20T01:20:29.783Z">
+<meta property="article:author" content="OCNYang">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Android教程系列">
+<meta property="article:tag" content="Toolbar">
+<meta property="article:tag" content="Material design">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.shedoor.net/toolBar/1.png">
+
+<link rel="canonical" href="http://ocnyang.com/2016/08/26/ToolbarUse/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Toolbar开发详解 | OCNYang の 博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+<script defer src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">OCNYang の 博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">ʕ•̫͡•ʕ̢·͡˔·ོɁ̡̣-̫͡-ʕ•͓͡•ʔ-̫͡-ʔ</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://ocnyang.com/2016/08/26/ToolbarUse/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="OCNYang">
+      <meta itemprop="description" content="前线 Android 开发者，亦涉猎 Flutter。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OCNYang の 博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Toolbar开发详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-08-26 18:03:15" itemprop="dateCreated datePublished" datetime="2016-08-26T18:03:15+00:00">2016-08-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 01:20:29" itemprop="dateModified" datetime="2021-07-20T01:20:29+00:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Material-design/" itemprop="url" rel="index"><span itemprop="name">Material design</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="初识-Toolbar"><a href="#初识-Toolbar" class="headerlink" title="初识 Toolbar"></a>初识 Toolbar</h2><p>Toolbar 是在 Android 5.0 开始推出的一个 Material Design 风格的导航控件 ，Google 非常推荐大家使用 Toolbar 来作为Android客户端的导航栏，以此来取代之前的 Actionbar 。与 Actionbar 相比，Toolbar 明显要灵活的多。它不像 Actionbar 一样，一定要固定在Activity的顶部，而是可以放到界面的任意位置。  </p>
+<span id="more"></span>
+<p>除此之外，在设计 Toolbar 的时候，Google也留给了开发者很多可定制修改的余地，这些可定制修改的属性在API文档中都有详细介绍，如：</p>
+<ul>
+<li>设置导航栏图标；</li>
+<li>设置App的logo；</li>
+<li>支持设置标题和子标题；</li>
+<li>支持添加一个或多个的自定义控件；</li>
+<li>支持Action Menu；  </li>
+</ul>
+<p><img src="http://img.shedoor.net/toolBar/1.png"></p>
+<p>总之，与 Actionbar 相比，Toolbar 让我感受到Google满满的诚意。怎样？是否已经对 Toolbar 有大概的了解，跃跃欲试的感觉出来了有木有？接下来，我们就一步一步的来看如何使用 Toolbar。</p>
+<h2 id="开始使用-Toolbar"><a href="#开始使用-Toolbar" class="headerlink" title="开始使用 Toolbar"></a>开始使用 Toolbar</h2><p>前面提到 Toolbar 是在 Android 5.0 才开始加上的，Google 为了将这一设计向下兼容，自然也少不了要推出兼容版的 Toolbar 。为此，我们需要在工程中引入 appcompat-v7 的兼容包，使用 android.support.v7.widget.Toolbar 进行开发。下面看一下代码结构，同样把重点部分已经红圈圈出：</p>
+<p><img src="http://img.shedoor.net/toolBar/2.png"></p>
+<ul>
+<li><p>ToolbarActivity 包含了 Toolbar 的一些基本使用， ZhiHuActivity 是在熟悉了 Toolbar 后对知乎主页面的一个高仿实现。</p>
+</li>
+<li><p>layout和menu文件夹分别是上面提到的两个Activity的布局文件 和 actionmenu 菜单文件。</p>
+</li>
+<li><p>values、values-v19、values-v21 中包含了一些自定义的 theme，后面用到的时候会顺带讲解。</p>
+</li>
+</ul>
+<p>我们先来看一下 ToolbarActivity 的运行效果</p>
+<p><img src="http://img.shedoor.net/toolBar/3.gif"></p>
+<p>按照效果图，从左到右分别是我们前面提及到的<strong>导航栏图标、App的logo、标题和子标题、自定义控件、</strong>以及<strong>ActionMenu</strong>。接着，我们来看下布局文件和代码实现。</p>
+<p>首先，在布局文件 activity_tool_bar.xml 中添加进我们需要的 Toolbar 控件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot;&gt;
+
+    &lt;android.support.v7.widget.Toolbar
+        android:id=&quot;@+id/toolbar&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:background=&quot;@color/color_0176da&quot;&gt;
+
+        &lt;!--自定义控件--&gt;
+        &lt;TextView
+            android:layout_width=&quot;wrap_content&quot;
+            android:layout_height=&quot;wrap_content&quot;
+            android:text=&quot;Clock&quot; /&gt;
+    &lt;/android.support.v7.widget.Toolbar&gt;
+&lt;/LinearLayout&gt;  
+</code></pre>
+<p>接着在 base_toolbar_menu.xml 中添加 action menu 菜单项</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;&gt;
+
+    &lt;item
+        android:id=&quot;@id/action_search&quot;
+        android:icon=&quot;@mipmap/ic_search&quot;
+        android:title=&quot;@string/menu_search&quot;
+        app:showAsAction=&quot;ifRoom&quot; /&gt;
+
+    &lt;item
+        android:id=&quot;@id/action_notification&quot;
+        android:icon=&quot;@mipmap/ic_notifications&quot;
+        android:title=&quot;@string/menu_notifications&quot;
+        app:showAsAction=&quot;ifRoom&quot; /&gt;
+
+    &lt;item
+        android:id=&quot;@+id/action_item1&quot;
+        android:title=&quot;@string/item_01&quot;
+        app:showAsAction=&quot;never&quot; /&gt;
+
+    &lt;item
+        android:id=&quot;@+id/action_item2&quot;
+        android:title=&quot;@string/item_02&quot;
+        app:showAsAction=&quot;never&quot; /&gt;
+&lt;/menu&gt;  
+</code></pre>
+<p>最后到 ToolbarActivity 中调用代码拿到这 Toolbar 控件，并在代码中做各种setXXX操作。</p>
+<pre><code>/**
+ * Toolbar的基本使用
+ */
+public class ToolBarActivity extends BaseActivity &#123;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) &#123;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tool_bar);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar.setNavigationIcon(R.mipmap.ic_drawer_home);//设置导航栏图标
+        toolbar.setLogo(R.mipmap.ic_launcher);//设置app logo
+        toolbar.setTitle(&quot;Title&quot;);//设置主标题
+        toolbar.setSubtitle(&quot;Subtitle&quot;);//设置子标题
+
+        toolbar.inflateMenu(R.menu.base_toolbar_menu);//设置右上角的填充菜单
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() &#123;
+            @Override
+            public boolean onMenuItemClick(MenuItem item) &#123;
+                int menuItemId = item.getItemId();
+                if (menuItemId == R.id.action_search) &#123;
+                    Toast.makeText(ToolBarActivity.this , R.string.menu_search , Toast.LENGTH_SHORT).show();
+
+                &#125; else if (menuItemId == R.id.action_notification) &#123;
+                    Toast.makeText(ToolBarActivity.this , R.string.menu_notifications , Toast.LENGTH_SHORT).show();
+
+                &#125; else if (menuItemId == R.id.action_item1) &#123;
+                    Toast.makeText(ToolBarActivity.this , R.string.item_01 , Toast.LENGTH_SHORT).show();
+
+                &#125; else if (menuItemId == R.id.action_item2) &#123;
+                    Toast.makeText(ToolBarActivity.this , R.string.item_02 , Toast.LENGTH_SHORT).show();
+
+                &#125;
+                return true;
+            &#125;
+        &#125;);
+    &#125;
+&#125;  
+</code></pre>
+<p>代码到此已经完成了 Toolbar 的基本使用，注意，是基本使用而已！！！！！下面有几个代码里面需要注意的地方：</p>
+<ul>
+<li><p>1、我们在使用 Toolbar 时候需要先隐藏掉系统原先的导航栏，网上很多人都说给Activity设置一个NoActionBar的Theme。但个人觉得有点小题大做了，所以这里我直接在BaseActivity中调用 supportRequestWindowFeature(Window.FEATURE_NO_TITLE) 去掉了默认的导航栏（注意，我的BaseActivity是继承了AppCompatActivity的，如果是继承Activity就应该调用requestWindowFeature(Window.FEATURE_NO_TITLE)）；</p>
+</li>
+<li><p>2、如果你想修改标题和子标题的字体大小、颜色等，可以调用setTitleTextColor、setTitleTextAppearance、setSubtitleTextColor、setSubtitleTextAppearance 这些API；</p>
+</li>
+<li><p>3、自定义的View位于 title、subtitle 和 actionmenu 之间，这意味着，如果 title 和 subtitle 都在，且 actionmenu选项 太多的时候，留给自定义View的空间就越小；</p>
+</li>
+<li><p>4、导航图标 和 app logo 的区别在哪？如果你只设置 导航图标（ or app logo） 和 title、subtitle，会发现 app logo 和 title、subtitle 的间距比较小，看起来不如 导航图标 与 它们两搭配美观；</p>
+</li>
+<li><p>5、Toolbar 和其他控件一样，很多属性设置方法既支持代码设置，也支持在xml中设置（这里也是最最最最最坑爹的地方，如何坑爹法，请接着往下看）；</p>
+</li>
+</ul>
+<h2 id="Toolbar-踩坑填坑"><a href="#Toolbar-踩坑填坑" class="headerlink" title="Toolbar 踩坑填坑"></a>Toolbar 踩坑填坑</h2><h3 id="坑一：xml布局文件中，Toolbar属性设置无效"><a href="#坑一：xml布局文件中，Toolbar属性设置无效" class="headerlink" title="坑一：xml布局文件中，Toolbar属性设置无效"></a>坑一：xml布局文件中，Toolbar属性设置无效</h3><p>刚开始使用Toolbar的时候，我的布局文件中是这样写的</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot;&gt;
+
+    &lt;android.support.v7.widget.Toolbar
+        android:id=&quot;@+id/toolbar&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:background=&quot;@color/color_0176da&quot;
+        android:logo=&quot;@mipmap/ic_launcher&quot;
+        android:navigationIcon=&quot;@mipmap/ic_drawer_home&quot;
+        android:subtitle=&quot;456&quot;
+        android:title=&quot;123&quot;&gt;
+
+        &lt;!--自定义控件--&gt;
+        &lt;TextView
+            android:layout_width=&quot;wrap_content&quot;
+            android:layout_height=&quot;wrap_content&quot;
+            android:text=&quot;Clock&quot; /&gt;
+    &lt;/android.support.v7.widget.Toolbar&gt;
+&lt;/LinearLayout&gt;  
+</code></pre>
+<p>在真机跑起来之后，看到的结果是下面这样的。</p>
+<p><img src="http://img.shedoor.net/toolBar/4.png"></p>
+<p>此时心中真是万千匹草泥马在奔腾，除了设置背景色和TextView有效外，说好的 <strong>logo、navigationIcon、subtitle、title</strong> 都跑哪去了？在编译器没报错又不见效果的情况下，参考了其他开发者的用法后找到了以下的解决方案，就是在根布局中加入自定义属性的命名空间</p>
+<pre><code>xmlns:toolbar=&quot;http://schemas.android.com/apk/res-auto&quot;(这里的toolbar可以换成你想要其他命名，做过自定义控件的童鞋相比很熟悉此用法了)  
+</code></pre>
+<p>然后把所有用 android:xxx 设置无效的，都用 toolbar：xxx 设置即可生效。最终的布局代码如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:toolbar=&quot;http://schemas.android.com/apk/res-auto&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:orientation=&quot;vertical&quot;&gt;
+
+    &lt;android.support.v7.widget.Toolbar
+        android:id=&quot;@+id/toolbar&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:background=&quot;@color/color_0176da&quot;
+        toolbar:navigationIcon=&quot;@mipmap/ic_drawer_home&quot;
+        toolbar:logo=&quot;@mipmap/ic_launcher&quot;
+        toolbar:subtitle=&quot;456&quot;
+        toolbar:title=&quot;123&quot;&gt;
+
+        &lt;!--自定义控件--&gt;
+        &lt;TextView
+            android:layout_width=&quot;wrap_content&quot;
+            android:layout_height=&quot;wrap_content&quot;
+            android:text=&quot;Clock&quot; /&gt;
+    &lt;/android.support.v7.widget.Toolbar&gt;
+&lt;/LinearLayout&gt;  
+</code></pre>
+<p>到此即可解决 xml 中属性设置失效的问题，为什么会出现这种问题呢？我猜测是因为这个控件是兼容版的控件，用 android:xxx 设置无效是的这些属性是在兼容包中，不在默认的Android SDK中，所以我们需要额外的引入。至于为什么IDE不报错，估计就是bug了吧！</p>
+<h3 id="坑二：Action-Menu-Item-的文字颜色设置无效"><a href="#坑二：Action-Menu-Item-的文字颜色设置无效" class="headerlink" title="坑二：Action Menu Item 的文字颜色设置无效"></a>坑二：Action Menu Item 的文字颜色设置无效</h3><p>系统默设置了ActionMenu每个Item的文字颜色和大小，像ToolbarActivity在Google原生5.1系统下默认效果就是下面这样的</p>
+<p><img src="http://img.shedoor.net/toolBar/5.gif"></p>
+<p>Android 5.1 默认的ActionMenu Item的风格<br>此时，如果我有需求要改变一下item文字颜色，应该怎么破？我按照网上比较普遍的解决方案，做了如下两步的修改操作：</p>
+<ul>
+<li><p>在styles.xml中自定义一个Theme，并设置 actionMenuTextColor 属性（注意：不是 android:actionMenuTextColor ）  </p>
+<blockquote>
+</blockquote>
+  <style name="Theme.ToolBar.Base" parent="Theme.AppCompat.Light.NoActionBar">
+      <item name="actionMenuTextColor">@color/color_red</item>
+  </style>  </li>
+</ul>
+<p>在布局文件的Toolbar中设置popupTheme（注意：是toolbar:xxx，不是android:xxx）</p>
+<pre><code>&lt;android.support.v7.widget.Toolbar
+    android:id=&quot;@+id/toolbar&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:background=&quot;@color/color_0176da&quot;
+    toolbar:popupTheme=&quot;@style/Theme.ToolBar.Base&quot;&gt;
+
+    &lt;!--自定义控件--&gt;
+    &lt;TextView
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:text=&quot;Clock&quot; /&gt;
+&lt;/android.support.v7.widget.Toolbar&gt;
+</code></pre>
+<p>运行之后，文字的颜色的并没有发生任何改变。说好的改变颜色呢…..找来找去，最后在 StackOverflow 找到一个还不错的解决方案，就是把上面的的 actionMenuTextColor 属性换成 android:textColorPrimary 即可解决，最终得到下面的运行效果。</p>
+<p><img src="http://img.shedoor.net/toolBar/6.gif"></p>
+<blockquote>
+<p>这种方法也有一个小缺点，如果我把自定义控件换成Button，你会发现Button默认的文字颜色也变成了红色。所以，此处如果有朋友有更好的解决方案，请留言赐教。  </p>
+</blockquote>
+<p>如果你想要修改 ActionMenu Item 的文字大小，也可以在theme中设置加上如下设置</p>
+<pre><code>&lt;item name=&quot;android:textSize&quot;&gt;20sp&lt;/item&gt;  
+</code></pre>
+<p>以上就是目前使用 Toolbar 一些比较折腾的坑，感觉 Google 对 Toolbar 这些坑，还可以进一步优化优化，不然就坑苦了开发者们了。</p>
+<blockquote>
+<p>摘录来源：<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/79604c3ddcae">简书</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>OCNYang
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://ocnyang.com/2016/08/26/ToolbarUse/" title="Toolbar开发详解">http://ocnyang.com/2016/08/26/ToolbarUse/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              <a href="/tags/Android%E6%95%99%E7%A8%8B%E7%B3%BB%E5%88%97/" rel="tag"><i class="fa fa-tag"></i> Android教程系列</a>
+              <a href="/tags/Toolbar/" rel="tag"><i class="fa fa-tag"></i> Toolbar</a>
+              <a href="/tags/Material-design/" rel="tag"><i class="fa fa-tag"></i> Material design</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/24/CombinedWidget/" rel="prev" title="组合控件详解 & 自定义属性">
+      <i class="fa fa-chevron-left"></i> 组合控件详解 & 自定义属性
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/31/AndroidGu/" rel="next" title="Android初级躲不开的那些坑">
+      Android初级躲不开的那些坑 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E8%AF%86-Toolbar"><span class="nav-number">1.</span> <span class="nav-text">初识 Toolbar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8-Toolbar"><span class="nav-number">2.</span> <span class="nav-text">开始使用 Toolbar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Toolbar-%E8%B8%A9%E5%9D%91%E5%A1%AB%E5%9D%91"><span class="nav-number">3.</span> <span class="nav-text">Toolbar 踩坑填坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%B8%80%EF%BC%9Axml%E5%B8%83%E5%B1%80%E6%96%87%E4%BB%B6%E4%B8%AD%EF%BC%8CToolbar%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE%E6%97%A0%E6%95%88"><span class="nav-number">3.1.</span> <span class="nav-text">坑一：xml布局文件中，Toolbar属性设置无效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%BA%8C%EF%BC%9AAction-Menu-Item-%E7%9A%84%E6%96%87%E5%AD%97%E9%A2%9C%E8%89%B2%E8%AE%BE%E7%BD%AE%E6%97%A0%E6%95%88"><span class="nav-number">3.2.</span> <span class="nav-text">坑二：Action Menu Item 的文字颜色设置无效</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">OCNYang</p>
+  <div class="site-description" itemprop="description">前线 Android 开发者，亦涉猎 Flutter。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">OCNYang</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">381k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">Reading time total &asymp;</span>
+    <span title="Reading time total">5:47</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+<br /> #换行
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : '',
+      owner       : '',
+      admin       : [''],
+      id          : 'fbde6a360fead4ea6fd74d68979587f4',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+  
+</body>
+</html>
